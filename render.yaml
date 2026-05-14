@@ -18,12 +18,22 @@ services:
       - key: DATABASE_URL
         value: sqlite:///backend/data/books_daily.db
       - key: HF_TOKEN
+        value: ""
       - key: TELEGRAM_BOT_TOKEN
+        value: ""
       - key: SMTP_EMAIL
+        value: ""
       - key: SMTP_PASSWORD
+        value: ""
       - key: TWILIO_ACCOUNT_SID
+        value: ""
       - key: TWILIO_AUTH_TOKEN
+        value: ""
       - key: TWILIO_WHATSAPP_NUMBER
+        value: ""
       - key: STRIPE_KEY
+        value: ""
       - key: PAYPAL_KEY
+        value: ""
       - key: CRICAPI_KEY
+        value: ""
