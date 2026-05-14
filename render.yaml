@@ -17,17 +17,13 @@ services:
         value: "false"
       - key: DATABASE_URL
         value: sqlite:///backend/data/books_daily.db
-      - fromKey: HF_TOKEN
-      - fromKey: TELEGRAM_BOT_TOKEN
-      - fromKey: SMTP_EMAIL
-      - fromKey: SMTP_PASSWORD
-      - fromKey: TWILIO_ACCOUNT_SID
-      - fromKey: TWILIO_AUTH_TOKEN
-      - fromKey: TWILIO_WHATSAPP_NUMBER
-      - fromKey: STRIPE_KEY
-      - fromKey: PAYPAL_KEY
-      - fromKey: CRICAPI_KEY
-    disk:
-      name: data
-      mountPath: /opt/render/project/src/backend/data
-      sizeGB: 1
+      - key: HF_TOKEN
+      - key: TELEGRAM_BOT_TOKEN
+      - key: SMTP_EMAIL
+      - key: SMTP_PASSWORD
+      - key: TWILIO_ACCOUNT_SID
+      - key: TWILIO_AUTH_TOKEN
+      - key: TWILIO_WHATSAPP_NUMBER
+      - key: STRIPE_KEY
+      - key: PAYPAL_KEY
+      - key: CRICAPI_KEY
