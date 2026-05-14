@@ -3,8 +3,8 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-    app_name: str = "Books Daily Updates"
-    app_version: str = "1.0.0"
+    app_name: str = "SyntraHub"
+    app_version: str = "2.0.0"
     debug: bool = True
 
     database_url: Optional[str] = None
@@ -32,6 +32,7 @@ class Settings(BaseSettings):
 
     stripe_key: Optional[str] = None
     paypal_key: Optional[str] = None
+    cricapi_key: Optional[str] = None
 
     class Config:
         env_file = ".env"

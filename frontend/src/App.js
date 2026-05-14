@@ -13,6 +13,12 @@ import Orders from './pages/Orders';
 import Settings from './pages/Settings';
 import BooksPage from './pages/BooksPage';
 import CricfyTv from './pages/CricfyTv';
+import SocialPage from './pages/SocialPage';
+import EventsPage from './pages/EventsPage';
+import PaymentsPage from './pages/PaymentsPage';
+import SmartHomePage from './pages/SmartHomePage';
+import RewardsPage from './pages/RewardsPage';
+import HowItWorks from './pages/HowItWorks';
 import './styles.css';
 
 const pages = [
@@ -26,6 +32,12 @@ const pages = [
   { k: 'cricfy', c: CricfyTv },
   { k: 'upload', c: BooksPage },
   { k: 'settings', c: Settings },
+  { k: 'social', c: SocialPage },
+  { k: 'events', c: EventsPage },
+  { k: 'payments', c: PaymentsPage },
+  { k: 'smarthome', c: SmartHomePage },
+  { k: 'rewards', c: RewardsPage },
+  { k: 'howitworks', c: HowItWorks },
 ];
 
 function AppContent() {

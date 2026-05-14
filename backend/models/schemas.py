@@ -483,16 +483,430 @@ class CricfyMatchCreate(BaseModel):
 
 
 class DashboardStats(BaseModel):
-    total_books: int
-    total_categories: int
-    active_schedules: int
-    chapters_read: int
-    cart_items: int
-    total_orders: int
-    total_media: int
-    total_podcasts: int
-    total_videos: int
-    live_matches: int = 0
-    total_cricfy_matches: int = 0
-    featured_books: List[BookResponse] = []
-    recent_orders: List[OrderResponse] = []
+     total_books: int
+     total_categories: int
+     active_schedules: int
+     chapters_read: int
+     cart_items: int
+     total_orders: int
+     total_media: int
+     total_podcasts: int
+     total_videos: int
+     live_matches: int = 0
+     total_cricfy_matches: int = 0
+     total_posts: int = 0
+     total_events: int = 0
+     total_devices: int = 0
+     total_credits: int = 0
+     featured_books: List[BookResponse] = []
+     recent_orders: List[OrderResponse] = []
+
+
+# ============================================================
+# MODULE: Social Network
+# ============================================================
+
+class SocialPostCreate(BaseModel):
+    content: str
+    media_urls: List[str] = []
+    post_type: str = "text"
+    visibility: str = "public"
+    location: Optional[str] = None
+    tags: List[str] = []
+
+
+class SocialPostResponse(BaseModel):
+    id: int
+    user_id: int
+    content: str
+    media_urls: List[str] = []
+    post_type: str
+    visibility: str
+    location: Optional[str] = None
+    tags: List[str] = []
+    like_count: int = 0
+    comment_count: int = 0
+    share_count: int = 0
+    is_pinned: bool = False
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class SocialCommentCreate(BaseModel):
+    content: str
+    parent_id: Optional[int] = None
+
+
+class SocialCommentResponse(BaseModel):
+    id: int
+    post_id: int
+    user_id: int
+    parent_id: Optional[int] = None
+    content: str
+    like_count: int = 0
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SocialStoryCreate(BaseModel):
+    media_url: str
+    media_type: str = "image"
+    caption: Optional[str] = None
+
+
+class SocialStoryResponse(BaseModel):
+    id: int
+    user_id: int
+    media_url: str
+    media_type: str
+    caption: Optional[str] = None
+    expires_at: datetime
+    view_count: int = 0
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SocialReelCreate(BaseModel):
+    video_url: str
+    thumbnail_url: Optional[str] = None
+    caption: Optional[str] = None
+    audio_url: Optional[str] = None
+    duration_seconds: int = 30
+
+
+class SocialReelResponse(BaseModel):
+    id: int
+    user_id: int
+    video_url: str
+    thumbnail_url: Optional[str] = None
+    caption: Optional[str] = None
+    audio_url: Optional[str] = None
+    duration_seconds: int
+    view_count: int = 0
+    like_count: int = 0
+    share_count: int = 0
+    is_trending: bool = False
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ConversationCreate(BaseModel):
+    participant_ids: List[int]
+
+
+class ConversationResponse(BaseModel):
+    id: int
+    participant_ids: List[int] = []
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class MessageCreate(BaseModel):
+    conversation_id: int
+    content: str
+    media_url: Optional[str] = None
+
+
+class MessageResponse(BaseModel):
+    id: int
+    conversation_id: int
+    sender_id: int
+    content: str
+    media_url: Optional[str] = None
+    is_read: bool = False
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================
+# MODULE: Events & Tickets
+# ============================================================
+
+class VenueCreate(BaseModel):
+    name: str
+    city: str
+    state: Optional[str] = None
+    country: str
+    address: Optional[str] = None
+    capacity: int = 0
+    amenities: List[str] = []
+    seating_layout: dict = {}
+
+
+class VenueResponse(BaseModel):
+    id: int
+    name: str
+    city: str
+    state: Optional[str] = None
+    country: str
+    address: Optional[str] = None
+    capacity: int
+    amenities: List[str] = []
+    seating_layout: dict = {}
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class EventCreate(BaseModel):
+    venue_id: int
+    title: str
+    description: Optional[str] = None
+    event_type: str
+    category: Optional[str] = None
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    poster_url: Optional[str] = None
+    is_featured: bool = False
+
+
+class EventResponse(BaseModel):
+    id: int
+    venue_id: int
+    title: str
+    description: Optional[str] = None
+    event_type: str
+    category: Optional[str] = None
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    poster_url: Optional[str] = None
+    status: str
+    is_featured: bool
+    view_count: int
+    created_at: datetime
+    venue: Optional[VenueResponse] = None
+
+    class Config:
+        from_attributes = True
+
+
+class TicketResponse(BaseModel):
+    id: int
+    event_id: int
+    user_id: Optional[int] = None
+    ticket_type: str
+    price: float
+    currency: str
+    seat_number: Optional[str] = None
+    qr_code: Optional[str] = None
+    status: str
+    is_transferable: bool
+    purchased_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class BookingRequest(BaseModel):
+    event_id: int
+    ticket_type: str = "general"
+    quantity: int = 1
+
+
+# ============================================================
+# MODULE: Payments & Wallet
+# ============================================================
+
+class PaymentMethodCreate(BaseModel):
+    method_type: str
+    provider: str
+    details: dict = {}
+    is_default: bool = False
+
+
+class PaymentMethodResponse(BaseModel):
+    id: int
+    user_id: int
+    method_type: str
+    provider: str
+    details: dict = {}
+    is_default: bool
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class WalletResponse(BaseModel):
+    id: int
+    user_id: int
+    balance_usd: float
+    balances: dict = {}
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class TransferRequest(BaseModel):
+    amount: float
+    currency: str = "USD"
+    description: Optional[str] = None
+    to_user_id: Optional[int] = None
+
+
+class TransactionResponse(BaseModel):
+    id: int
+    wallet_id: int
+    transaction_type: str
+    amount: float
+    currency: str
+    description: Optional[str] = None
+    reference_id: Optional[str] = None
+    status: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class InvoiceResponse(BaseModel):
+    id: int
+    user_id: int
+    invoice_number: str
+    amount: float
+    currency: str
+    status: str
+    due_date: Optional[date] = None
+    paid_at: Optional[datetime] = None
+    items: list = []
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class QRPaymentRequest(BaseModel):
+    amount: float
+    currency: str = "USD"
+    description: Optional[str] = None
+
+
+# ============================================================
+# MODULE: Smart Home
+# ============================================================
+
+class SmartDeviceCreate(BaseModel):
+    name: str
+    device_type: str
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    room: Optional[str] = None
+    capabilities: List[str] = []
+
+
+class SmartDeviceResponse(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    device_type: str
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    room: Optional[str] = None
+    status: str
+    state: dict = {}
+    capabilities: List[str] = []
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SmartSceneCreate(BaseModel):
+    name: str
+    icon: str = "🏠"
+    actions: List[dict] = []
+
+
+class SmartSceneResponse(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    icon: str
+    actions: List[dict] = []
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class DeviceCommand(BaseModel):
+    device_id: int
+    command: str
+    params: dict = {}
+
+
+# ============================================================
+# MODULE: Earn-to-Earn
+# ============================================================
+
+class CreditTransactionResponse(BaseModel):
+    id: int
+    user_id: int
+    action: str
+    credits: int
+    description: Optional[str] = None
+    reference_type: Optional[str] = None
+    reference_id: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class RewardRedemptionCreate(BaseModel):
+    reward_type: str
+    credits_spent: int
+    value: Optional[str] = None
+
+
+class RewardRedemptionResponse(BaseModel):
+    id: int
+    user_id: int
+    reward_type: str
+    credits_spent: int
+    value: Optional[str] = None
+    status: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserAchievementResponse(BaseModel):
+    id: int
+    user_id: int
+    achievement: str
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LeaderboardEntry(BaseModel):
+    user_id: int
+    name: str
+    total_credits: int
+    achievements: int = 0
+    rank: int = 0

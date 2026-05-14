@@ -21,7 +21,7 @@ const MatchCard = ({ match }) => {
       </div>
       <div className="match-teams">
         <div className="team team1">
-          <img src={match.team1_logo || `https://placehold.co/80x80/1e40af/ffffff?text=${match.team1[0]}`} alt={match.team1} className="team-logo" />
+          <img src={match.team1_logo || `https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=80&h=80&fit=crop&auto=format&text=${match.team1[0]}`} alt={match.team1} className="team-logo" />
           <span className="team-name">{match.team1}</span>
           {match.score_team1 && <span className="team-score">{match.score_team1}</span>}
           {match.overs_team1 && <span className="team-overs">({match.overs_team1} ov)</span>}
@@ -32,7 +32,7 @@ const MatchCard = ({ match }) => {
           {match.match_result && <span className="match-result">{match.match_result}</span>}
         </div>
         <div className="team team2">
-          <img src={match.team2_logo || `https://placehold.co/80x80/dc2626/ffffff?text=${match.team2[0]}`} alt={match.team2} className="team-logo" />
+          <img src={match.team2_logo || `https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=80&h=80&fit=crop&auto=format&text=${match.team2[0]}`} alt={match.team2} className="team-logo" />
           <span className="team-name">{match.team2}</span>
           {match.score_team2 && <span className="team-score">{match.score_team2}</span>}
           {match.overs_team2 && <span className="team-overs">({match.overs_team2} ov)</span>}
@@ -69,7 +69,7 @@ const LiveBanner = ({ matches }) => {
         </div>
         <div className="live-banner-teams">
           <div className="banner-team">
-            <img src={live.team1_logo || 'https://placehold.co/60x60/1e40af/ffffff?text=T1'} alt={live.team1} />
+            <img src={live.team1_logo || 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=60&h=60&fit=crop&auto=format&text=T1'} alt={live.team1} />
             <span>{live.team1}</span>
             <span className="banner-score">{live.score_team1 || ''}</span>
           </div>
@@ -77,7 +77,7 @@ const LiveBanner = ({ matches }) => {
             <span className="banner-vs-text">VS</span>
           </div>
           <div className="banner-team">
-            <img src={live.team2_logo || 'https://placehold.co/60x60/dc2626/ffffff?text=T2'} alt={live.team2} />
+            <img src={live.team2_logo || 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=60&h=60&fit=crop&auto=format&text=T2'} alt={live.team2} />
             <span>{live.team2}</span>
             <span className="banner-score">{live.score_team2 || ''}</span>
           </div>

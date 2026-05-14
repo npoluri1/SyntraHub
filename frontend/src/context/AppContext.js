@@ -1,9 +1,38 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../api';
 
 const AppContext = createContext();
 
 export const useApp = () => useContext(AppContext);
+
+const applyAIColors = (colors) => {
+  if (!colors) return;
+  const root = document.documentElement;
+  root.style.setProperty('--primary', colors.primary);
+  root.style.setProperty('--primary-hover', colors.primary_hover);
+  root.style.setProperty('--primary-active', colors.primary_active);
+  root.style.setProperty('--accent-1', colors.accent_1);
+  root.style.setProperty('--accent-2', colors.accent_2);
+  root.style.setProperty('--accent-3', colors.accent_3);
+  root.style.setProperty('--success', colors.success);
+  root.style.setProperty('--danger', colors.danger);
+  root.style.setProperty('--warning', colors.warning);
+  root.style.setProperty('--bg', colors.bg);
+  root.style.setProperty('--card-bg', colors.card_bg);
+  root.style.setProperty('--card-border', colors.card_border);
+  root.style.setProperty('--text', colors.text);
+  root.style.setProperty('--text-secondary', colors.text_secondary);
+  // Dynamic gradient on body
+  document.body.style.setProperty(
+    '--ai-gradient',
+    `radial-gradient(ellipse at 20% 0%, ${colors.gradient_start}15 0%, transparent 60%),
+     radial-gradient(ellipse at 80% 100%, ${colors.gradient_end}10 0%, transparent 60%)`
+  );
+  // Animated particles
+  root.style.setProperty('--particle-color-1', colors.accent_1);
+  root.style.setProperty('--particle-color-2', colors.accent_2);
+  root.style.setProperty('--particle-color-3', colors.primary);
+};
 
 export const AppProvider = ({ children }) => {
   const [page, setPage] = useState('dashboard');
@@ -25,13 +54,37 @@ export const AppProvider = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [aiColors, setAiColors] = useState(null);
+  const [trendingTopics, setTrendingTopics] = useState([]);
+  const intervalRef = useRef(null);
 
   const USER_ID = 1;
+
+  const loadAIColors = useCallback(async (seed) => {
+    try {
+      const colors = await api(`/api/ai/colors${seed ? '?seed=' + encodeURIComponent(seed) : ''}`);
+      setAiColors(colors);
+      applyAIColors(colors);
+    } catch (e) { console.error(e); }
+  }, []);
+
+  const loadTrendingTopics = useCallback(async () => {
+    try { setTrendingTopics(await api('/api/ai/trending-topics')); }
+    catch (e) { setTrendingTopics([]); }
+  }, []);
 
   useEffect(() => {
     initUser();
     loadInitialData();
+    loadAIColors();
+    loadTrendingTopics();
+    intervalRef.current = setInterval(() => loadAIColors(), 600000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, []);
+
+  useEffect(() => {
+    if (aiColors) applyAIColors(aiColors);
+  }, [aiColors]);
 
   const initUser = async () => {
     try {
@@ -190,10 +243,12 @@ export const AppProvider = ({ children }) => {
     orders, shippingZones, currencies, countries, cricfyMatches,
     selectedCurrency, changeCurrency,
     dashboard, loading,
+    aiColors, trendingTopics,
     USER_ID,
     loadCatalog, loadCategories, loadDailyReading,
     loadSchedules, loadCart, loadMedia, loadPodcasts,
     loadPlaylists, loadCricfyMatches, loadOrders, loadDashboard,
+    loadAIColors, loadTrendingTopics,
     handleScheduleBook, handleAdvanceChapter,
     handleAddToCart, handleRemoveFromCart,
     handleSendNotification,

@@ -1,8 +1,8 @@
 @echo off
-title Books Daily Updates
+title SyntraHub
 
 echo ============================================
-echo   Books Daily Updates - Setup ^& Run
+echo   SyntraHub - Setup ^& Run
 echo ============================================
 echo.
 

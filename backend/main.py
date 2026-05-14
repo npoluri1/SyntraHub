@@ -44,6 +44,14 @@ async def startup():
     except Exception as e:
         print(f"Shipping seed skipped: {e}")
     try:
+        from backend.services.cricket_data_service import cricket_data
+        db = SessionLocal()
+        cricket_data.seed_real_matches(db)
+        db.close()
+        cricket_data.start_auto_updates(interval_minutes=5)
+    except Exception as e:
+        print(f"Cricket data seed skipped: {e}")
+    try:
         from backend.database.connection import SessionLocal
         db = SessionLocal()
         books = db.query(Book).filter(Book.is_active == True).all()
@@ -59,6 +67,7 @@ async def startup():
 
 
 from backend.routes import books, reading, users, catalog, media, store, podcasts, videos, search as search_route, cricfy
+from backend.routes import social, events, payments, smarthome, rewards, ai_content
 app.include_router(books.router)
 app.include_router(reading.router)
 app.include_router(users.router)
@@ -69,6 +78,12 @@ app.include_router(podcasts.router)
 app.include_router(videos.router)
 app.include_router(search_route.router)
 app.include_router(cricfy.router)
+app.include_router(social.router)
+app.include_router(events.router)
+app.include_router(payments.router)
+app.include_router(smarthome.router)
+app.include_router(rewards.router)
+app.include_router(ai_content.router)
 
 from backend.services.vector_search import vector_search
 from backend.database.models import Book
@@ -78,6 +93,11 @@ from backend.database.models import (
     Book, Category, ReadingSchedule, ChapterSummary, CartItem,
     Order, OrderItem, MediaContent, PodcastEpisode, PlaylistVideo,
     CricfyMatch,
+    SocialPost, SocialComment, SocialStory, SocialReel, Conversation, Message,
+    Venue, Event, Ticket,
+    PaymentMethod, Wallet, Transaction, Invoice,
+    SmartDevice, SmartScene,
+    CreditTransaction, RewardRedemption, UserAchievement,
 )
 from backend.models.schemas import DashboardStats, BookResponse
 
@@ -99,6 +119,12 @@ async def get_dashboard(user_id: int = Query(1), db: Session = Depends(get_db)):
     total_videos = db.query(PlaylistVideo).count()
     live_matches = db.query(CricfyMatch).filter(CricfyMatch.status == "live").count()
     total_cricfy_matches = db.query(CricfyMatch).count()
+    total_posts = db.query(SocialPost).count()
+    total_events = db.query(Event).count()
+    total_devices = db.query(SmartDevice).count()
+    total_credits = db.query(CreditTransaction).filter(
+        CreditTransaction.user_id == user_id
+    ).count()
 
     featured = db.query(Book).options(
         joinedload(Book.images), joinedload(Book.categories)
@@ -125,6 +151,8 @@ async def get_dashboard(user_id: int = Query(1), db: Session = Depends(get_db)):
         total_media=total_media, total_podcasts=total_podcasts,
         total_videos=total_videos,
         live_matches=live_matches, total_cricfy_matches=total_cricfy_matches,
+        total_posts=total_posts, total_events=total_events,
+        total_devices=total_devices, total_credits=total_credits,
         featured_books=featured_list, recent_orders=recent_orders,
     )
 

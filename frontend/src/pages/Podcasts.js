@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import AiMediaPlaceholder from '../components/AiMediaPlaceholder';
 
 const Podcasts = () => {
   const { podcasts } = useApp();
@@ -39,9 +40,7 @@ const Podcasts = () => {
             {ep.thumbnail_url ? (
               <img src={ep.thumbnail_url} alt={ep.title} className="podcast-thumb" />
             ) : (
-              <div className="podcast-thumb-placeholder">
-                <span>🎙️</span>
-              </div>
+              <AiMediaPlaceholder type="podcast" accent="#30d158" size={300} />
             )}
             <div className="podcast-info">
               <h3>{ep.title}</h3>

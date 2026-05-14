@@ -12,6 +12,12 @@ const navItems = [
   { k: 'orders', i: '📦', l: 'Orders' },
   { k: 'upload', i: '📁', l: 'Upload' },
   { k: 'settings', i: '⚙️', l: 'Settings' },
+  { k: 'social', i: '🌐', l: 'Social' },
+  { k: 'events', i: '🎪', l: 'Events' },
+  { k: 'payments', i: '💳', l: 'Payments' },
+  { k: 'smarthome', i: '🏠', l: 'SmartHome' },
+  { k: 'howitworks', i: '⚡', l: 'How It Works' },
+  { k: 'rewards', i: '🏆', l: 'Rewards' },
 ];
 
 const Navbar = () => {
@@ -21,8 +27,8 @@ const Navbar = () => {
     <nav className="navbar navbar-3d">
       <div className="nav-inner">
           <div className="nav-brand card-3d" onClick={() => setPage('dashboard')}>
-            <div className="brand-icon accent-gradient">📚</div>
-          <span className="brand-text">GlobalBookStore</span>
+            <div className="brand-icon accent-gradient">⚔️</div>
+          <span className="brand-text">SyntraHub</span>
         </div>
         <div className="nav-links">
           {navItems.map(p => (

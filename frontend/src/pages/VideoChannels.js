@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import AiMediaPlaceholder from '../components/AiMediaPlaceholder';
 
 const PLATFORM_ICONS = {
   youtube: { icon: '▶️', color: '#ff0000' },
   tiktok: { icon: '🎵', color: '#000000' },
   instagram: { icon: '📸', color: '#e4405f' },
 };
+
+const ACCENT_MAP = { youtube: '#ff0000', tiktok: '#000000', instagram: '#e4405f' };
 
 const VideoChannels = () => {
   const { playlists } = useApp();
@@ -36,8 +39,10 @@ const VideoChannels = () => {
                 }}>
                   {PLATFORM_ICONS[p.platform]?.icon || '🎬'} {p.platform}
                 </div>
-                {p.thumbnail_url && (
+                {p.thumbnail_url ? (
                   <img src={p.thumbnail_url} alt={p.name} className="channel-thumb" />
+                ) : (
+                  <AiMediaPlaceholder type="video" accent={ACCENT_MAP[p.platform] || '#4a4ae0'} size={300} />
                 )}
               </div>
               <div className="channel-info">

@@ -1,4 +1,4 @@
-# Global Super-App — Complete Blueprint
+# SyntraHub — Complete Blueprint
 
 ## Vision
 One app to rule all — Amazon + Flipkart + Lazada + Alibaba + Netflix + Hotstar + Facebook + Instagram + YouTube + BookMyShow + Smart Home + Global Payments. All in one platform. Web + Mobile (iOS/Android) with 2D→3D→4D→5D cinematic experience.

@@ -5,19 +5,21 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from backend.database.connection import SessionLocal, init_db
 from backend.database.models import (
     Category, Book, BookImage, MediaContent, book_categories,
-    PodcastEpisode, VideoPlaylist, PlaylistVideo, CricfyMatch,
+    PodcastEpisode, VideoPlaylist, PlaylistVideo, 
 )
 from datetime import datetime, timezone, date
 
+from backend.services.media_image_service import get_media_image, get_avatar
+
 COVER_COLORS = ["1e40af","059669","d97706","dc2626","7c3aed","db2777","0891b2","4f46e5"]
+
+def _real_img(media_type="book", w=400, h=600):
+    return get_media_image(media_type, w, h)["url"]
 
 def seed():
     init_db()
     db = SessionLocal()
     try:
-        if db.query(Category).count() > 0:
-            print("Database already seeded. Skipping.")
-            return
 
         categories_data = [
             ("Self-Help", "self-help", "Personal growth & productivity", "🧠", [
@@ -252,7 +254,7 @@ def seed():
 
         def add_cover(book, color_idx, label):
             color = COVER_COLORS[color_idx % len(COVER_COLORS)]
-            cover_url = f"https://placehold.co/300x450/{color}/ffffff?text={label.replace(' ', '+')[:30]}"
+            cover_url = _real_img("book", 400, 600)
             db.add(BookImage(book_id=book.id, url=cover_url, alt_text=f"{book.title} cover", is_primary=True))
 
         for i, (book, cats) in enumerate(all_products):
@@ -272,7 +274,7 @@ def seed():
             ("Book Review: Deep Work by Cal Newport", "video", "instagram", "https://instagram.com/reel/xyz", None, "BookTok", ["deep work","focus"], 1),
             ("How to Build Good Habits", "video", "youtube", "https://youtu.be/example1", "https://www.youtube.com/embed/example1", "Better Ideas", ["habits","self-help"], 1),
             ("The Psychology of Money Summary", "podcast", "apple", "https://podcasts.apple.com/episode/xyz", None, "Morgan Housel", ["finance","money"], 1),
-            ("Daily Reading: Chapter by Chapter", "video", "instagram", "https://instagram.com/reel/xyz2", None, "BooksDaily", ["reading","daily"], 0),
+            ("Daily Reading: Chapter by Chapter", "video", "instagram", "https://instagram.com/reel/xyz2", None, "SyntraHub", ["reading","daily"], 0),
             ("Why You Should Read 'The Alchemist'", "video", "tiktok", "https://tiktok.com/@booktok/video/xyz2", None, "BookTok", ["alchemist","fiction"], 1),
             ("Rich Dad Poor Dad - Full Breakdown", "video", "youtube", "https://youtu.be/example2", "https://www.youtube.com/embed/example2", "Financial Education", ["finance","investing"], 1),
             ("iPhone 15 Pro Max Review", "video", "youtube", "https://youtu.be/iphone15", "https://www.youtube.com/embed/iphone15", "TechReviewer", ["iphone","apple"], 1),
@@ -285,7 +287,7 @@ def seed():
                 if title.lower().startswith(bt.split(":")[0].strip().lower()[:10]):
                     book_id = b.id
                     break
-            db.add(MediaContent(book_id=book_id, title=title, media_type=mtype, platform=platform, url=url, embed_url=embed, author=author, tags=tags, is_featured=bool(featured), thumbnail_url=f"https://placehold.co/480x360/1e40af/ffffff?text={title.replace(' ','+')[:30]}", duration_minutes=15))
+            db.add(MediaContent(book_id=book_id, title=title, media_type=mtype, platform=platform, url=url, embed_url=embed, author=author, tags=tags, is_featured=bool(featured), thumbnail_url=_real_img("video", 480, 360), duration_minutes=15))
 
         podcast_data = [
             ("Atomic Habits Deep Dive", "James Clear & Book Club", "spotify", "https://open.spotify.com/episode/atomic1", None, 45, 1, 1, ["habits","atomic","productivity"], True),
@@ -295,7 +297,7 @@ def seed():
             ("Psychology of Money Explained", "Finance Talks", "apple", "https://podcasts.apple.com/episode/money1", None, 42, 1, 5, ["money","psychology","finance"], True),
             ("Think and Grow Rich Analysis", "Success Stories", "spotify", "https://open.spotify.com/episode/think1", None, 55, 1, 6, ["success","wealth","mindset"], False),
             ("Power of Habit Breakdown", "Behavior Science", "youtube", "https://youtu.be/podcast_habit1", "https://www.youtube.com/embed/podcast_habit1", 35, 1, 7, ["habits","behavior","science"], True),
-            ("Book Review Weekly Ep 42", "BooksDaily Podcast", "spotify", "https://open.spotify.com/show/booksdaily1", None, 60, None, None, ["books","review","weekly"], True),
+            ("Book Review Weekly Ep 42", "SyntraHub Podcast", "spotify", "https://open.spotify.com/show/syntrahub1", None, 60, None, None, ["books","review","weekly"], True),
             ("Author Interview: Best Sellers", "Lit Insights", "apple", "https://podcasts.apple.com/show/lit1", None, 48, None, None, ["interview","authors","bestsellers"], False),
             ("Reading Habits That Changed My Life", "Self Improvement Daily", "spotify", "https://open.spotify.com/episode/reading1", None, 25, None, None, ["reading","habits","self-help"], True),
         ]
@@ -306,7 +308,7 @@ def seed():
                 if b.title.lower().startswith(title.split(":")[0].strip().lower()[:15]):
                     book_id = b.id
                     break
-            db.add(PodcastEpisode(book_id=book_id, title=title, host=host, platform=platform, audio_url=url, embed_url=embed, duration_minutes=duration, season_number=season, episode_number=episode, tags=tags, is_featured=featured, published_date=date.today(), thumbnail_url=f"https://placehold.co/480x360/4f46e5/ffffff?text={title.replace(' ','+')[:30]}"))
+            db.add(PodcastEpisode(book_id=book_id, title=title, host=host, platform=platform, audio_url=url, embed_url=embed, duration_minutes=duration, season_number=season, episode_number=episode, tags=tags, is_featured=featured, published_date=date.today(), thumbnail_url=_real_img("podcast", 480, 360)))
 
         playlist_data = [
             ("BookTube Essentials", "Curated book reviews and deep dives", "youtube", "BookTube Channel", "https://youtube.com/@booktube", True, 0, [
@@ -340,34 +342,17 @@ def seed():
         ]
 
         for pname, pdesc, plat, channel, channel_url, featured, order, videos in playlist_data:
-            playlist = VideoPlaylist(name=pname, description=pdesc, platform=plat, channel_name=channel, channel_url=channel_url, is_featured=featured, sort_order=order, thumbnail_url=f"https://placehold.co/800x400/7c3aed/ffffff?text={pname.replace(' ','+')}")
+            playlist = VideoPlaylist(name=pname, description=pdesc, platform=plat, channel_name=channel, channel_url=channel_url, is_featured=featured, sort_order=order, thumbnail_url=_real_img("video", 800, 400))
             db.add(playlist)
             db.flush()
             for i, (vtitle, vurl, vembed, vdur, vplat) in enumerate(videos):
-                db.add(PlaylistVideo(playlist_id=playlist.id, title=vtitle, url=vurl, embed_url=vembed, duration_minutes=vdur, platform=vplat, sort_order=i, view_count=0, thumbnail_url=f"https://placehold.co/480x360/1e40af/ffffff?text={vtitle.replace(' ','+')[:25]}"))
-
-        today = date.today()
-        from datetime import timedelta
-        cricfy_matches = [
-            CricfyMatch(title="🏆 ICC World Cup 2026: India vs Australia", team1="India", team2="Australia", team1_logo="https://placehold.co/80x80/ff9933/ffffff?text=IND", team2_logo="https://placehold.co/80x80/ffcc00/000000?text=AUS", match_date=today, match_time="14:30 IST", status="live", series_name="ICC World Cup 2026", venue="Wankhede Stadium, Mumbai", live_url="https://www.youtube.com/watch?v=example1", embed_url="https://www.youtube.com/embed/example1", thumbnail_url="https://placehold.co/640x360/1e40af/ffffff?text=IND+vs+AUS", platform="youtube", score_team1="245/4", score_team2="120/2", overs_team1=40.2, overs_team2=22.0, is_featured=True, sort_order=1),
-            CricfyMatch(title="🏏 IPL 2026: Mumbai Indians vs Chennai Super Kings", team1="Mumbai Indians", team2="CSK", team1_logo="https://placehold.co/80x80/004d8c/ffffff?text=MI", team2_logo="https://placehold.co/80x80/ffcc00/000000?text=CSK", match_date=today, match_time="19:30 IST", status="live", series_name="IPL 2026", venue="Wankhede Stadium, Mumbai", live_url="https://www.youtube.com/watch?v=example2", embed_url="https://www.youtube.com/embed/example2", thumbnail_url="https://placehold.co/640x360/dc2626/ffffff?text=MI+vs+CSK", platform="youtube", score_team1="180/5", score_team2="45/1", overs_team1=20.0, overs_team2=5.3, is_featured=True, sort_order=2),
-            CricfyMatch(title="🏏 ICC World Cup 2026: England vs Pakistan", team1="England", team2="Pakistan", team1_logo="https://placehold.co/80x80/ffffff/000000?text=ENG", team2_logo="https://placehold.co/80x80/00a651/ffffff?text=PAK", match_date=today + timedelta(days=1), match_time="10:00 IST", status="upcoming", series_name="ICC World Cup 2026", venue="Lord's, London", live_url="https://www.youtube.com/watch?v=example3", embed_url="https://www.youtube.com/embed/example3", thumbnail_url="https://placehold.co/640x360/059669/ffffff?text=ENG+vs+PAK", platform="youtube", is_featured=True, sort_order=3),
-            CricfyMatch(title="🏏 Asia Cup 2026: Sri Lanka vs Bangladesh", team1="Sri Lanka", team2="Bangladesh", team1_logo="https://placehold.co/80x80/1e40af/ffffff?text=SL", team2_logo="https://placehold.co/80x80/00a651/ffffff?text=BAN", match_date=today + timedelta(days=2), match_time="14:30 IST", status="upcoming", series_name="Asia Cup 2026", venue="R.Premadasa Stadium, Colombo", live_url="https://www.youtube.com/watch?v=example4", embed_url="https://www.youtube.com/embed/example4", thumbnail_url="https://placehold.co/640x360/7c3aed/ffffff?text=SL+vs+BAN", platform="youtube", is_featured=True, sort_order=4),
-            CricfyMatch(title="🏏 IPL 2026: Royal Challengers vs Kolkata Knight Riders", team1="RCB", team2="KKR", team1_logo="https://placehold.co/80x80/dc2626/ffffff?text=RCB", team2_logo="https://placehold.co/80x80/3b82f6/ffffff?text=KKR", match_date=today + timedelta(days=1), match_time="19:30 IST", status="upcoming", series_name="IPL 2026", venue="Chinnaswamy Stadium, Bengaluru", live_url="https://www.youtube.com/watch?v=example5", embed_url="https://www.youtube.com/embed/example5", thumbnail_url="https://placehold.co/640x360/d97706/ffffff?text=RCB+vs+KKR", platform="youtube", sort_order=5),
-            CricfyMatch(title="🏏 Big Bash League: Sydney Sixers vs Melbourne Stars", team1="Sydney Sixers", team2="Melbourne Stars", team1_logo="https://placehold.co/80x80/ff6600/ffffff?text=SIX", team2_logo="https://placehold.co/80x80/00a3e0/ffffff?text=STA", match_date=today + timedelta(days=3), match_time="08:00 IST", status="upcoming", series_name="Big Bash League 2026", venue="SCG, Sydney", live_url="https://www.youtube.com/watch?v=example6", embed_url="https://www.youtube.com/embed/example6", thumbnail_url="https://placehold.co/640x360/0891b2/ffffff?text=BBL", platform="youtube", sort_order=6),
-            CricfyMatch(title="🏏 SA20: Sunrisers Eastern Cape vs MI Cape Town", team1="Sunrisers EC", team2="MI Cape Town", team1_logo="https://placehold.co/80x80/ff6600/ffffff?text=SEC", team2_logo="https://placehold.co/80x80/004d8c/ffffff?text=MICT", match_date=today + timedelta(days=4), match_time="21:00 IST", status="upcoming", series_name="SA20 League", venue="St George's Park, Gqeberha", live_url="https://www.youtube.com/watch?v=example7", embed_url="https://www.youtube.com/embed/example7", thumbnail_url="https://placehold.co/640x360/4f46e5/ffffff?text=SA20", platform="hotstar", sort_order=7),
-            CricfyMatch(title="✅ ICC World Cup 2026: New Zealand vs South Africa", team1="New Zealand", team2="South Africa", team1_logo="https://placehold.co/80x80/000000/ffffff?text=NZ", team2_logo="https://placehold.co/80x80/ffa500/ffffff?text=SA", match_date=today - timedelta(days=1), match_time="14:30 IST", status="completed", series_name="ICC World Cup 2026", venue="Seddon Park, Hamilton", live_url="https://www.youtube.com/watch?v=example8", embed_url="https://www.youtube.com/embed/example8", thumbnail_url="https://placehold.co/640x360/059669/ffffff?text=NZ+vs+SA", platform="youtube", score_team1="320/8", score_team2="280/10", overs_team1=50.0, overs_team2=47.3, match_result="New Zealand won by 40 runs", sort_order=8),
-            CricfyMatch(title="✅ IPL 2026: Rajasthan Royals vs Delhi Capitals", team1="Rajasthan Royals", team2="Delhi Capitals", team1_logo="https://placehold.co/80x80/ff1493/ffffff?text=RR", team2_logo="https://placehold.co/80x80/0000ff/ffffff?text=DC", match_date=today - timedelta(days=2), match_time="19:30 IST", status="completed", series_name="IPL 2026", venue="Sawai Mansingh Stadium, Jaipur", live_url="https://www.youtube.com/watch?v=example9", embed_url="https://www.youtube.com/embed/example9", thumbnail_url="https://placehold.co/640x360/1e40af/ffffff?text=RR+vs+DC", platform="youtube", score_team1="210/4", score_team2="185/8", overs_team1=20.0, overs_team2=20.0, match_result="Rajasthan Royals won by 25 runs", sort_order=9),
-            CricfyMatch(title="✅ T20I: West Indies vs Australia", team1="West Indies", team2="Australia", team1_logo="https://placehold.co/80x80/8b0000/ffffff?text=WI", team2_logo="https://placehold.co/80x80/ffcc00/000000?text=AUS", match_date=today - timedelta(days=3), match_time="06:00 IST", status="completed", series_name="T20I Series", venue="Sabina Park, Jamaica", live_url="https://www.youtube.com/watch?v=example10", embed_url="https://www.youtube.com/embed/example10", thumbnail_url="https://placehold.co/640x360/dc2626/ffffff?text=WI+vs+AUS", platform="youtube", score_team1="175/6", score_team2="178/4", overs_team1=20.0, overs_team2=18.3, match_result="Australia won by 6 wickets", sort_order=10),
-        ]
-        for match in cricfy_matches:
-            db.add(match)
+                db.add(PlaylistVideo(playlist_id=playlist.id, title=vtitle, url=vurl, embed_url=vembed, duration_minutes=vdur, platform=vplat, sort_order=i, view_count=0, thumbnail_url=_real_img("video", 480, 360)))
 
         db.commit()
         books_count = sum(1 for b,_ in all_products if b.product_type=="book")
         elec_count = sum(1 for b,_ in all_products if b.product_type=="electronics")
         cloth_count = sum(1 for b,_ in all_products if b.product_type=="clothing")
-        print(f"Seeded {len(categories_data)} categories, {books_count} books, {elec_count} electronics, {cloth_count} clothing, {len(media_data)} media, {len(podcast_data)} podcasts, {len(playlist_data)} playlists, {len(cricfy_matches)} cricfy matches")
+        print(f"Seeded {len(categories_data)} categories, {books_count} books, {elec_count} electronics, {cloth_count} clothing, {len(media_data)} media, {len(podcast_data)} podcasts, {len(playlist_data)} playlists")
     except Exception as e:
         db.rollback()
         print(f"Seed error: {e}")

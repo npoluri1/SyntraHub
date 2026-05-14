@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import AiMediaPlaceholder from './AiMediaPlaceholder';
+
+const ACCENTS = ['#4a4ae0', '#e040a0', '#30d158', '#ff9f0a', '#5e5ce6', '#ff375f', '#64d2ff'];
 
 const MediaCard = ({ item }) => {
+  const accent = useMemo(() => ACCENTS[item.id % ACCENTS.length], [item.id]);
+
   return (
     <div className="media-card media-card-3d card-shine">
       {item.embed_url ? (
@@ -12,11 +17,11 @@ const MediaCard = ({ item }) => {
           <div className="media-play">▶</div>
         </div>
       ) : (
-        <div className="media-thumb media-thumb-placeholder">
-          <span style={{ fontSize: 40 }}>
-            {item.media_type === 'podcast' ? '🎙️' : '🎬'}
-          </span>
-        </div>
+        <AiMediaPlaceholder
+          type={item.media_type === 'podcast' ? 'podcast' : item.media_type === 'audio' ? 'audio' : 'video'}
+          accent={accent}
+          size={300}
+        />
       )}
       <div className="media-info">
         <h3>{item.title}</h3>

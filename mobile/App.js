@@ -310,21 +310,122 @@ export default function App() {
     );
   };
 
+  const HowItWorksTab = () => (
+    <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+      {/* Hero */}
+      <View style={styles.hiwHero}>
+        <View style={styles.hiwBadge}><Text style={styles.hiwBadgeText}>For readers & growth seekers</Text></View>
+        <Text style={styles.hiwHeroTitle}>Not just content.{'\n'}<Text style={{color: '#0071e3'}}>Growth you can feel.</Text></Text>
+        <Text style={styles.hiwHeroDesc}>Discover Viking sagas, podcasts, mindset books — scored, summarized, and delivered daily.</Text>
+        <TouchableOpacity style={[styles.primaryBtn, {width: '100%', marginBottom: 8}]} onPress={() => setPage('books')}>
+          <Text style={styles.primaryBtnText}>Explore 10,000+ Titles</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Steps */}
+      <Text style={[styles.hiwSectionLabel, {marginTop: 8}]}>How it works</Text>
+      <Text style={styles.hiwSectionTitle}>Four steps to a <Text style={{color: '#0071e3'}}>stronger you</Text></Text>
+
+      {[
+        {num: '01', title: 'Discover', desc: 'Browse curated Viking content & books. Search by interest — results in seconds.'},
+        {num: '02', title: 'Score', desc: 'Every item rated on 6 quality signals. Full transparency, no black box.'},
+        {num: '03', title: 'Learn', desc: 'AI-crafted daily summaries with key takeaways. Read in 5 minutes.'},
+        {num: '04', title: 'Grow', desc: 'Track progress, earn rewards, and build your Viking mindset day by day.'},
+      ].map((step, i) => (
+        <View key={i} style={styles.hiwStep}>
+          <Text style={styles.hiwStepNum}>{step.num}</Text>
+          <Text style={styles.hiwStepTitle}>{step.title}</Text>
+          <Text style={styles.hiwStepDesc}>{step.desc}</Text>
+        </View>
+      ))}
+
+      {/* Features */}
+      <Text style={[styles.hiwSectionLabel, {marginTop: 24}]}>Full transparency</Text>
+      <Text style={styles.hiwSectionTitle}>Scored on <Text style={{color: '#0071e3'}}>6 proven signals</Text></Text>
+
+      {[
+        {icon: '📖', title: 'Content Quality', score: '15/15', desc: 'Rated on substance, reviews, and real-world impact.'},
+        {icon: '🎯', title: 'Relevance', score: '15/15', desc: 'AI-matched to your interests and growth goals.'},
+        {icon: '⚡', title: 'Quick Learning', score: '14/15', desc: '5-min summaries with key takeaways.'},
+        {icon: '📱', title: 'Omnichannel', score: '15/15', desc: 'Telegram, WhatsApp, Email, or in-app.'},
+      ].map((f, i) => (
+        <View key={i} style={styles.hiwFeatureCard}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+              <Text style={{fontSize: 22}}>{f.icon}</Text>
+              <View>
+                <Text style={{fontWeight: '700', fontSize: 15, color: '#1d1d1f'}}>{f.title}</Text>
+                <Text style={{fontSize: 12, color: '#8e8e93'}}>{f.desc}</Text>
+              </View>
+            </View>
+            <Text style={{fontSize: 18, fontWeight: '800', color: '#30d158'}}>{f.score}</Text>
+          </View>
+        </View>
+      ))}
+
+      {/* Pricing */}
+      <Text style={[styles.hiwSectionLabel, {marginTop: 24}]}>Simple pricing</Text>
+      <Text style={styles.hiwSectionTitle}>Start free. <Text style={{color: '#0071e3'}}>Scale</Text> when ready.</Text>
+
+      <View style={styles.hiwPricingCard}>
+        <Text style={{fontSize: 16, fontWeight: '700', color: '#1d1d1f'}}>Free</Text>
+        <View style={{flexDirection: 'row', alignItems: 'baseline', marginVertical: 8}}>
+          <Text style={{fontSize: 34, fontWeight: '800', color: '#1d1d1f'}}>$0</Text>
+          <Text style={{fontSize: 14, color: '#aeaeb2', marginLeft: 4}}>/forever</Text>
+        </View>
+        <Text style={{fontSize: 13, color: '#6e6e73', marginBottom: 12}}>✓ Full library access · Daily summaries · No card</Text>
+        <TouchableOpacity style={[styles.smallBtn, {alignSelf: 'flex-start'}]} onPress={() => setPage('books')}>
+          <Text style={styles.smallBtnText}>Start free</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.hiwPricingCard, {borderColor: '#0071e3', borderWidth: 2}]}>
+        <View style={{position: 'absolute', top: -10, right: 16, backgroundColor: '#0071e3', paddingHorizontal: 12, paddingVertical: 3, borderRadius: 20}}>
+          <Text style={{color: '#fff', fontSize: 11, fontWeight: '700'}}>Most popular</Text>
+        </View>
+        <Text style={{fontSize: 16, fontWeight: '700', color: '#1d1d1f'}}>Pro</Text>
+        <View style={{flexDirection: 'row', alignItems: 'baseline', marginVertical: 8}}>
+          <Text style={{fontSize: 34, fontWeight: '800', color: '#1d1d1f'}}>$9</Text>
+          <Text style={{fontSize: 14, color: '#aeaeb2', marginLeft: 4}}>/month</Text>
+        </View>
+        <Text style={{fontSize: 13, color: '#6e6e73', marginBottom: 12}}>✓ Unlimited summaries · AI scoring · Offline · Delivery to phone</Text>
+        <TouchableOpacity style={[styles.primaryBtn, {alignSelf: 'flex-start'}]} onPress={() => setPage('books')}>
+          <Text style={styles.primaryBtnText}>Get started</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* CTA */}
+      <View style={[styles.dailyCard, {marginTop: 24, marginBottom: 20, alignItems: 'center'}]}>
+        <Text style={{fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 12, textAlign: 'center'}}>
+          Your next transformation is already out there.
+        </Text>
+        <Text style={{fontSize: 14, color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginBottom: 20, lineHeight: 20}}>
+          Thousands of books, podcasts, and videos waiting. Start for free — no card required.
+        </Text>
+        <TouchableOpacity style={styles.primaryBtn} onPress={() => setPage('books')}>
+          <Text style={styles.primaryBtnText}>Start Your Journey →</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
       <View style={styles.header}>
         <View style={styles.headerIcon}><Text style={{ fontSize: 18 }}>📚</Text></View>
-        <Text style={styles.headerTitle}>BooksDaily</Text>
+        <Text style={styles.headerTitle}>SyntraHub</Text>
       </View>
       <View style={styles.content}>
         {page === 'dashboard' && <Dashboard />}
         {page === 'books' && <BooksTab />}
         {page === 'schedule' && <ScheduleTab />}
+        {page === 'howitworks' && <HowItWorksTab />}
         {page === 'settings' && <SettingsTab />}
       </View>
       <View style={styles.tabBar}>
         {[
+          { key: 'howitworks', icon: '⚡', label: 'How It Works' },
           { key: 'dashboard', icon: '📊', label: 'Today' },
           { key: 'books', icon: '📖', label: 'Books' },
           { key: 'schedule', icon: '📅', label: 'Schedule' },
@@ -474,4 +575,30 @@ const styles = StyleSheet.create({
   tabIcon: { fontSize: 20 },
   tabLabel: { fontSize: 10, color: '#8e8e93', marginTop: 2, fontWeight: '500' },
   activeTabLabel: { color: '#0071e3', fontWeight: '700' },
+
+  // How It Works
+  hiwHero: { marginBottom: 24 },
+  hiwBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(0,113,227,0.08)', paddingHorizontal: 14, paddingVertical: 5, borderRadius: 20, marginBottom: 12 },
+  hiwBadgeText: { fontSize: 12, color: '#0071e3', fontWeight: '600' },
+  hiwHeroTitle: { fontSize: 30, fontWeight: '800', color: '#1d1d1f', letterSpacing: -0.5, lineHeight: 36, marginBottom: 10 },
+  hiwHeroDesc: { fontSize: 15, color: '#6e6e73', lineHeight: 22, marginBottom: 20 },
+  hiwSectionLabel: { fontSize: 12, color: '#0071e3', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 },
+  hiwSectionTitle: { fontSize: 24, fontWeight: '800', color: '#1d1d1f', letterSpacing: -0.3, marginBottom: 16 },
+  hiwStep: {
+    backgroundColor: '#fff', borderRadius: 14, padding: 18, marginBottom: 10,
+    borderLeftWidth: 3, borderLeftColor: '#0071e3',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2,
+  },
+  hiwStepNum: { fontSize: 28, fontWeight: '800', color: '#0071e3', letterSpacing: -1, marginBottom: 4 },
+  hiwStepTitle: { fontSize: 16, fontWeight: '700', color: '#1d1d1f', marginBottom: 4 },
+  hiwStepDesc: { fontSize: 13, color: '#6e6e73', lineHeight: 18 },
+  hiwFeatureCard: {
+    backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 10,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2,
+  },
+  hiwPricingCard: {
+    backgroundColor: '#fff', borderRadius: 16, padding: 22, marginBottom: 12,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 6, elevation: 2,
+    position: 'relative',
+  },
 });

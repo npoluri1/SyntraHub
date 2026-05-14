@@ -98,7 +98,7 @@ class EmailNotifier:
     </div>
   </div>
   <div class="footer">
-    <p>Books Daily Updates — Read smarter, not harder</p>
+    <p>SyntraHub — Your all-in-one platform</p>
     <p>To change notification settings, visit your dashboard.</p>
   </div>
 </div>
@@ -196,7 +196,7 @@ class WhatsAppNotifier:
             msg += "\n\n📌 Key Takeaways:\n"
             for i, p in enumerate(key_points, 1):
                 msg += f"{i}. {p}\n"
-        msg += "\n\nBooks Daily Updates"
+        msg += "\n\nSyntraHub"
         return self.send_whatsapp(to_number, msg)
 
     def send_whatsapp(self, to_number: str, message: str) -> bool:

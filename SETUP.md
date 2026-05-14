@@ -1,6 +1,6 @@
-# Books Daily Updates — Setup Guide
+# SyntraHub — Setup Guide
 
-Get daily book chapter summaries delivered to your phone or inbox.
+All-in-one platform: books, media, marketplace, and more.
 
 ---
 
@@ -26,7 +26,7 @@ Edit `.env` with your notification credentials for each channel you want.
 
 1. Go to your Google Account → **Security** → **2-Step Verification** → Turn it **ON**
 2. Go to **App Passwords** (https://myaccount.google.com/apppasswords)
-3. Select app: **Mail**, device: **Other** → name it `Books Daily`
+3. Select app: **Mail**, device: **Other** → name it `SyntraHub`
 4. Copy the 16-character password (spaces are fine)
 5. In `.env`:
    ```
@@ -37,7 +37,7 @@ Edit `.env` with your notification credentials for each channel you want.
 ### 🤖 Telegram
 
 1. Open Telegram → search for **@BotFather**
-2. Send `/newbot` → choose a name (e.g. `Books Daily`) → choose a username (e.g. `BooksDailyBot`)
+2. Send `/newbot` → choose a name (e.g. `SyntraHub`) → choose a username (e.g. `SyntraHubBot`)
 3. Copy the HTTP API token (looks like `123456789:ABCdef...`)
 4. In `.env`:
    ```
@@ -124,7 +124,7 @@ From the **Dashboard**, click **Send to My Phone** to trigger a one-time notific
 
 - **API Docs**: http://localhost:8000/docs
 - **Logs**: Terminal output shows notification delivery status
-- **DB**: `backend/data/books_daily.db` (SQLite)
+- **DB**: `backend/data/syntrahub.db` (SQLite)
 
 ---
 

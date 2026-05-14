@@ -391,3 +391,334 @@ class CurrencyRate(Base):
     is_default = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ============================================================
+# MODULE: Social Network (Posts, Feed, Stories, Reels, Messenger)
+# ============================================================
+
+social_post_likes = Table(
+    "social_post_likes", Base.metadata,
+    Column("post_id", Integer, ForeignKey("social_posts.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+)
+
+class SocialPost(Base):
+    __tablename__ = "social_posts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    media_urls = Column(JSON, default=list)
+    post_type = Column(String(20), default="text")
+    visibility = Column(String(20), default="public")
+    location = Column(String(300), nullable=True)
+    tags = Column(JSON, default=list)
+    like_count = Column(Integer, default=0)
+    comment_count = Column(Integer, default=0)
+    share_count = Column(Integer, default=0)
+    is_pinned = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=None, onupdate=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="social_posts")
+    comments = relationship("SocialComment", back_populates="post", cascade="all, delete-orphan")
+    liked_by = relationship("User", secondary=social_post_likes, backref="liked_posts")
+
+
+class SocialComment(Base):
+    __tablename__ = "social_comments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    post_id = Column(Integer, ForeignKey("social_posts.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    parent_id = Column(Integer, ForeignKey("social_comments.id"), nullable=True)
+    content = Column(Text, nullable=False)
+    like_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    post = relationship("SocialPost", back_populates="comments")
+    user = relationship("User", backref="social_comments")
+    replies = relationship("SocialComment", backref="parent", remote_side=[id], cascade="all")
+
+
+class SocialStory(Base):
+    __tablename__ = "social_stories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    media_url = Column(String(1000), nullable=False)
+    media_type = Column(String(20), default="image")
+    caption = Column(String(500), nullable=True)
+    expires_at = Column(DateTime, nullable=False)
+    view_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="stories")
+
+
+class SocialReel(Base):
+    __tablename__ = "social_reels"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    video_url = Column(String(1000), nullable=False)
+    thumbnail_url = Column(String(1000), nullable=True)
+    caption = Column(String(500), nullable=True)
+    audio_url = Column(String(1000), nullable=True)
+    duration_seconds = Column(Integer, default=30)
+    view_count = Column(Integer, default=0)
+    like_count = Column(Integer, default=0)
+    share_count = Column(Integer, default=0)
+    is_trending = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="reels")
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=None, onupdate=lambda: datetime.now(timezone.utc))
+
+    participants = relationship("User", secondary="conversation_participants", backref="conversations")
+    messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
+
+
+conversation_participants = Table(
+    "conversation_participants", Base.metadata,
+    Column("conversation_id", Integer, ForeignKey("conversations.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+)
+
+
+class Message(Base):
+    __tablename__ = "messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    media_url = Column(String(1000), nullable=True)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    conversation = relationship("Conversation", back_populates="messages")
+    sender = relationship("User", backref="sent_messages")
+
+
+# ============================================================
+# MODULE: Events & Tickets (BookMyShow/Ticketmaster)
+# ============================================================
+
+class Venue(Base):
+    __tablename__ = "venues"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(300), nullable=False)
+    city = Column(String(200), nullable=False)
+    state = Column(String(200), nullable=True)
+    country = Column(String(200), nullable=False)
+    address = Column(String(500), nullable=True)
+    capacity = Column(Integer, default=0)
+    amenities = Column(JSON, default=list)
+    seating_layout = Column(JSON, default=dict)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    events = relationship("Event", back_populates="venue", cascade="all, delete-orphan")
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    venue_id = Column(Integer, ForeignKey("venues.id"), nullable=False)
+    title = Column(String(500), nullable=False)
+    description = Column(Text, nullable=True)
+    event_type = Column(String(50), nullable=False)
+    category = Column(String(100), nullable=True)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=True)
+    poster_url = Column(String(1000), nullable=True)
+    status = Column(String(20), default="upcoming")
+    is_featured = Column(Boolean, default=False)
+    view_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=None, onupdate=lambda: datetime.now(timezone.utc))
+
+    venue = relationship("Venue", back_populates="events")
+    tickets = relationship("Ticket", back_populates="event", cascade="all, delete-orphan")
+
+
+class Ticket(Base):
+    __tablename__ = "tickets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    ticket_type = Column(String(50), default="general")
+    price = Column(Float, default=0.0)
+    currency = Column(String(10), default="USD")
+    seat_number = Column(String(50), nullable=True)
+    qr_code = Column(String(500), nullable=True)
+    status = Column(String(20), default="available")
+    is_transferable = Column(Boolean, default=True)
+    purchased_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    event = relationship("Event", back_populates="tickets")
+    user = relationship("User", backref="tickets")
+
+
+# ============================================================
+# MODULE: Global Payments & Wallet
+# ============================================================
+
+class PaymentMethod(Base):
+    __tablename__ = "payment_methods"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    method_type = Column(String(50), nullable=False)
+    provider = Column(String(100), nullable=False)
+    details = Column(JSON, default=dict)
+    is_default = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="payment_methods")
+
+
+class Wallet(Base):
+    __tablename__ = "wallets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
+    balance_usd = Column(Float, default=0.0)
+    balances = Column(JSON, default=dict)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=None, onupdate=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="wallet")
+    transactions = relationship("Transaction", back_populates="wallet", cascade="all, delete-orphan")
+
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    wallet_id = Column(Integer, ForeignKey("wallets.id"), nullable=False)
+    transaction_type = Column(String(50), nullable=False)
+    amount = Column(Float, default=0.0)
+    currency = Column(String(10), default="USD")
+    description = Column(String(500), nullable=True)
+    reference_id = Column(String(200), nullable=True)
+    status = Column(String(20), default="completed")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    wallet = relationship("Wallet", back_populates="transactions")
+
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    invoice_number = Column(String(50), nullable=False, unique=True)
+    amount = Column(Float, default=0.0)
+    currency = Column(String(10), default="USD")
+    status = Column(String(20), default="pending")
+    due_date = Column(Date, nullable=True)
+    paid_at = Column(DateTime, nullable=True)
+    items = Column(JSON, default=list)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="invoices")
+
+
+# ============================================================
+# MODULE: Smart Home
+# ============================================================
+
+class SmartDevice(Base):
+    __tablename__ = "smart_devices"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String(300), nullable=False)
+    device_type = Column(String(50), nullable=False)
+    brand = Column(String(100), nullable=True)
+    model = Column(String(100), nullable=True)
+    room = Column(String(100), nullable=True)
+    status = Column(String(20), default="offline")
+    state = Column(JSON, default=dict)
+    capabilities = Column(JSON, default=list)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=None, onupdate=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="smart_devices")
+
+
+class SmartScene(Base):
+    __tablename__ = "smart_scenes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String(300), nullable=False)
+    icon = Column(String(50), default="🏠")
+    actions = Column(JSON, default=list)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="smart_scenes")
+
+
+# ============================================================
+# MODULE: Earn-to-Earn (Credits & Rewards)
+# ============================================================
+
+class CreditTransaction(Base):
+    __tablename__ = "credit_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    action = Column(String(100), nullable=False)
+    credits = Column(Integer, default=0)
+    description = Column(String(500), nullable=True)
+    reference_type = Column(String(50), nullable=True)
+    reference_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="credit_transactions")
+
+
+class RewardRedemption(Base):
+    __tablename__ = "reward_redemptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    reward_type = Column(String(100), nullable=False)
+    credits_spent = Column(Integer, default=0)
+    value = Column(String(500), nullable=True)
+    status = Column(String(20), default="pending")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="reward_redemptions")
+
+
+class UserAchievement(Base):
+    __tablename__ = "user_achievements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    achievement = Column(String(200), nullable=False)
+    description = Column(String(500), nullable=True)
+    icon = Column(String(50), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="achievements")

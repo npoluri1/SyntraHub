@@ -4,7 +4,7 @@ import BookCard from '../components/BookCard';
 
 const Dashboard = () => {
   const { dashboard, dailyReading, schedules, cart, selectedCurrency,
-    currencies, handleSendNotification, setPage } = useApp();
+    currencies, trendingTopics, handleSendNotification, setPage } = useApp();
 
   const pct = (c, t) => t ? Math.round((c / t) * 100) : 0;
   const activeSchedules = schedules.filter(s => s.is_active).length;
@@ -19,7 +19,7 @@ const Dashboard = () => {
   return (
     <div className="page page-3d">
       <div className="page-header">
-        <h1 className="page-title text-3d-strong">Your <span>Global BookStore</span></h1>
+        <h1 className="page-title text-3d-strong">⚔️ SyntraHub</h1>
       </div>
 
       <div className="stats-grid">
@@ -40,6 +40,22 @@ const Dashboard = () => {
           <div className="stat-info"><h3>{cart.total_items}</h3><p>Cart Items</p></div>
         </div>
       </div>
+
+      {trendingTopics && trendingTopics.length > 0 && (
+        <div className="trending-bar">
+          <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--primary)', whiteSpace: 'nowrap' }}>
+            🔥 Trending
+          </span>
+          {trendingTopics.map(t => (
+            <div key={t.id} className="trending-chip" style={{ borderColor: t.color + '30' }}>
+              {t.icon} {t.name}
+              <div className="heat-bar">
+                <div className="heat-fill" style={{ width: t.heat + '%', background: t.color }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mid-stats">
         <div className="stat-card-sm card-3d-tilt shadow-3d">
@@ -110,7 +126,7 @@ const Dashboard = () => {
       ) : (
         <div className="empty-state">
           <div className="empty-icon">📖</div>
-          <h3>Welcome to GlobalBookStore</h3>
+          <h3>Welcome to SyntraHub</h3>
           <p>Browse our worldwide library, discover podcasts and videos, schedule daily reading, or shop for books with global shipping.</p>
           <div className="empty-actions">
             <button className="btn btn-primary" onClick={() => setPage('library')}>Browse Library</button>
