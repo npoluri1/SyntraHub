@@ -27,6 +27,7 @@
 - **API docs** at `/docs`, health check at `/api/health`.
 - **16 route files** in `backend/routes/` — catalog, store, social, events, payments, smarthome, rewards, ai_content, etc.
 - **Database models** in `backend/database/models.py` (724 lines, 38 SQLAlchemy models — Book, Product, Order, SocialPost, Event, SmartDevice, UserAchievement, etc.).
+- **Seed data** (`backend/data/seed_catalog.py`) generates 75+ books, 30 electronics, 30 clothing, 10+ playlists with 40+ videos across YouTube/TikTok/Instagram/Facebook/Shorts, 15+ podcasts. Images use `picsum.photos` (no API key needed).
 - **Mobile** hardcodes `API_BASE = 'http://localhost:8000'` — change for production.
 - **GLOBAL_SUPER_APP_PROMPT.md** is an aspirational roadmap — the actual codebase is simpler (multi-product catalog + schedules + notifications working).
 
