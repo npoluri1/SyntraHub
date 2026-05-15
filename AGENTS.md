@@ -51,6 +51,7 @@ start.bat                # creates venv, installs deps, seeds data, starts serve
 - `start.bat` does NOT use `backend/requirements.txt` — it pip-installs deps in three separate groups (core, excel, notifications/AI).
 - `python run.py` launches without `--reload`; use `uvicorn backend.main:app --reload` for hot reload during dev.
 - Frontend build (`npm run build`) must succeed for the full-stack server to serve the UI.
-- `sentence-transformers` downloads ~80MB model on first use — slow initial cold start.
+- `sentence-transformers`, `chromadb`, `numpy` are **not** in `backend/requirements.txt` — they're optional heavy deps installed only via `start.bat` (with `2>nul` error silencing). The code guards all optional imports via try/except.
+- `sentence-transformers` downloads ~80MB model on first use — very slow cold start.
 - ChromaDB persistence at `backend/data/chroma_db/` — delete to re-index.
 - `GLOBAL_SUPER_APP_PROMPT.md` and `SyntraHub_Resources.md` are prose references, not executable docs.
