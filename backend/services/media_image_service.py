@@ -1,97 +1,42 @@
-"""Real media images from Unsplash — no hardcoded placeholders."""
+"""Real media images from Lorem Picsum — always works, no API key needed."""
 import random
-import urllib.parse
-from typing import List, Dict, Optional
+from typing import Dict
 from datetime import datetime, timezone
 
-UNSPLASH_ACCESS_KEY = None
-
-SEARCH_QUERIES = {
-    "video": [
-        "book review", "library tour", "reading", "bookshelf",
-        "author interview", "literature", "study", "writing",
-    ],
-    "podcast": [
-        "microphone podcast", "recording studio", "radio",
-        "podcast studio", "audio equipment", "voice recording",
-    ],
-    "audio": [
-        "headphones music", "audio book", "listening",
-        "sound wave", "music studio", "earphones",
-    ],
-    "book": [
-        "books stack", "reading book", "library books",
-        "open book", "book pages", "vintage book",
-    ],
-    "default": [
-        "abstract gradient", "colorful pattern", "geometric art",
-    ],
-}
-
-TOPICS = [
-    "technology", "science", "business", "arts", "culture",
-    "nature", "education", "people", "fashion", "food",
-    "health", "travel", "music", "film", "gaming",
+PHOTO_IDS = [
+    1015, 1016, 1018, 1020, 1024, 1025, 1035, 1039, 1040, 1041,
+    1043, 1044, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1055,
+    1056, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065,
+    1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075,
+    1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085,
+    1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095,
+    1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104, 1105,
+    1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113, 1114, 1115,
+    1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123, 1124, 1125,
+    1126, 1127, 1128, 1129, 1130, 1131, 1132, 1133, 1134, 1135,
 ]
 
 
-def _get_unsplash_url(query: str, width: int = 640, height: int = 360) -> str:
-    """Generate a real Unsplash image URL with search-based relevance."""
-    encoded = urllib.parse.quote(f"{query} {random.choice(TOPICS)}")
-    if UNSPLASH_ACCESS_KEY:
-        return (
-            f"https://api.unsplash.com/photos/random?"
-            f"query={encoded}&w={width}&h={height}&fit=crop"
-            f"&client_id={UNSPLASH_ACCESS_KEY}"
-        )
-    # Direct Unsplash source URL — always returns a real image
-    seed = random.randint(1, 100000)
-    return (
-        f"https://images.unsplash.com/photo-{random.choice([
-            '1544716278-ca5e3f4abd8c', '1499951360461-1b9d6c4d2e6d',
-            '1524995997946-a1c2e315a42f', '1481626114875-59616e5f1e3a',
-            '1507842217343-583bb7270b66', '1476271759844-9f5c1e5c8d9e',
-            '1524995997946-a1c2e315a42f', '1506888603950-9b8f8e6f0b0b',
-            '1512821040700-c42d8d7c0b1a', '1491841573633-7b4e2f7b9c8d',
-            '1521588232096-b1cf8f91b0b8', '1519681393784-d120267933ba',
-            '1491970842471-2b8b8b5c8e6a', '1507842217343-583bb7270b66',
-            '1512821040700-c42d8d7c0b1a', '1476271759844-9f5c1e5c8d9e',
-            '1506888603950-9b8f8e6f0b0b', '1524995997946-a1c2e315a42f',
-        ])}?w={width}&h={height}&fit=crop&auto=format&q=80"
-    )
+def _picsum_url(width: int, height: int) -> str:
+    id = random.choice(PHOTO_IDS)
+    return f"https://picsum.photos/id/{id}/{width}/{height}"
 
 
 def get_media_image(media_type: str = "default", width: int = 640, height: int = 360) -> Dict:
-    """Get a real image URL for a media item."""
-    queries = SEARCH_QUERIES.get(media_type, SEARCH_QUERIES["default"])
-    query = random.choice(queries)
     return {
-        "url": _get_unsplash_url(query, width, height),
-        "query": query,
+        "url": _picsum_url(width, height),
+        "media_type": media_type,
         "width": width,
         "height": height,
-        "media_type": media_type,
         "fetched_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
 def get_avatar(size: int = 80) -> str:
-    """Get a random person avatar."""
     seed = random.randint(1, 999)
     return f"https://i.pravatar.cc/{size}?u={seed}"
 
 
 def get_team_logo(team_name: str, size: int = 80) -> str:
-    """Get a team logo using colored placeholder + real texture."""
-    colors = {
-        "india": "ff9933", "australia": "ffcc00", "england": "ffffff",
-        "pakistan": "00a651", "new zealand": "000000", "south africa": "ffa500",
-        "sri lanka": "1e40af", "bangladesh": "00a651", "west indies": "8b0000",
-        "afghanistan": "dc2626",
-    }
-    team_id = team_name.lower().replace(" ", "-")
-    color = colors.get(team_id, "1e40af")
-    return (
-        f"https://images.unsplash.com/photo-1519869325930-281384fba68a"
-        f"?w={size}&h={size}&fit=crop&auto=format"
-    )
+    seed = abs(hash(team_name)) % 1000
+    return f"https://picsum.photos/seed/team{seed}/{size}/{size}"
