@@ -11,7 +11,7 @@ if sys.platform == 'win32':
 from backend.database.connection import SessionLocal, init_db
 from backend.database.models import (
     Category, Book, BookImage, MediaContent, book_categories,
-    PodcastEpisode, VideoPlaylist, PlaylistVideo, 
+    PodcastEpisode, VideoPlaylist, PlaylistVideo, User, ReadingSchedule,
 )
 from datetime import datetime, timezone, date
 
@@ -454,6 +454,24 @@ def seed():
             for i, (vtitle, vurl, vembed, vdur, vplat) in enumerate(videos):
                 db.add(PlaylistVideo(playlist_id=playlist.id, title=vtitle, url=vurl, embed_url=vembed, duration_minutes=vdur, platform=vplat, sort_order=i, view_count=0, thumbnail_url=_real_img("video", 480, 360)))
 
+        # Schedule the first book for every user as a default experience
+        all_users = db.query(User).all()
+        first_book = db.query(Book).filter(Book.is_active == True).first()
+        
+        if first_book:
+            for user in all_users:
+                existing = db.query(ReadingSchedule).filter(
+                    ReadingSchedule.book_id == first_book.id,
+                    ReadingSchedule.user_id == user.id
+                ).first()
+                if not existing:
+                    db.add(ReadingSchedule(
+                        book_id=first_book.id,
+                        user_id=user.id,
+                        start_date=date.today().isoformat(),
+                        chapters_per_day=1,
+                        is_active=True
+                    ))
         db.commit()
         books_count = sum(1 for b,_ in all_products if b.product_type=="book")
         elec_count = sum(1 for b,_ in all_products if b.product_type=="electronics")
