@@ -54,12 +54,14 @@ export const AppProvider = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [authToken, setAuthToken] = useState(localStorage.getItem('auth_token'));
   const [aiColors, setAiColors] = useState(null);
   const [trendingTopics, setTrendingTopics] = useState([]);
+  const [dailyInsight, setDailyInsight] = useState(null);
   const intervalRef = useRef(null);
   const pollingRef = useRef(null);
 
-  const USER_ID = 1;
+  const USER_ID = user?.id || 1;
 
   const loadAIColors = useCallback(async (seed) => {
     try {
@@ -68,6 +70,51 @@ export const AppProvider = ({ children }) => {
       applyAIColors(colors);
     } catch (e) { console.error(e); }
   }, []);
+
+  const handleLogin = async (email, password) => {
+    try {
+      const formData = new FormData();
+      formData.append('username', email);
+      formData.append('password', password);
+
+      const data = await api('/api/auth/login', {
+        method: 'POST',
+        body: formData,
+        isFormData: true // We'll need to update api.js to handle this
+      });
+
+      localStorage.setItem('auth_token', data.access_token);
+      localStorage.setItem('book_user', JSON.stringify(data.user));
+      setAuthToken(data.access_token);
+      setUser(data.user);
+      setPage('dashboard');
+      loadInitialData();
+    } catch (e) { throw e; }
+  };
+
+  const handleRegister = async (name, email, password) => {
+    try {
+      const data = await api('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      localStorage.setItem('auth_token', data.access_token);
+      localStorage.setItem('book_user', JSON.stringify(data.user));
+      setAuthToken(data.access_token);
+      setUser(data.user);
+      setPage('dashboard');
+      loadInitialData();
+    } catch (e) { throw e; }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('book_user');
+    setAuthToken(null);
+    setUser(null);
+    setPage('dashboard');
+  };
 
   const loadTrendingTopics = useCallback(async () => {
     try { setTrendingTopics(await api('/api/ai/trending-topics')); }
@@ -258,6 +305,7 @@ export const AppProvider = ({ children }) => {
     selectedCurrency, changeCurrency,
     dashboard, loading,
     aiColors, trendingTopics, dailyInsight,
+    authToken,
     USER_ID,
     loadCatalog, loadCategories, loadDailyReading,
     loadSchedules, loadCart, loadMedia, loadPodcasts,
@@ -266,13 +314,7 @@ export const AppProvider = ({ children }) => {
     handleScheduleBook, handleAdvanceChapter,
     handleAddToCart, handleRemoveFromCart,
     handleSendNotification,
-  };
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-};
-handleAdvanceChapter,
-    handleAddToCart, handleRemoveFromCart,
-    handleSendNotification,
+    handleLogin, handleRegister, handleLogout,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

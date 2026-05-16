@@ -1,6 +1,25 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import BookCard from '../components/BookCard';
+import TypingText from '../components/TypingText';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 }
+  }
+};
 
 const Dashboard = () => {
   const { dashboard, dailyReading, schedules, cart, selectedCurrency,
@@ -17,12 +36,17 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="page page-3d">
-      <div className="page-header">
+    <motion.div 
+      className="page page-3d"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div className="page-header" variants={itemVariants}>
         <h1 className="page-title text-3d-strong">⚔️ SyntraHub</h1>
-      </div>
+      </motion.div>
 
-      <div className="stats-grid">
+      <motion.div className="stats-grid" variants={itemVariants}>
         <div className="stat-card stat-card-3d float-3d" onClick={() => setPage('library')}>
           <div className="stat-icon card-shine" style={{ background: '#e8f0fe' }}>📚</div>
           <div className="stat-info"><h3>{dashboard.total_books}</h3><p>Books Available</p></div>
@@ -39,10 +63,10 @@ const Dashboard = () => {
           <div className="stat-icon card-shine" style={{ background: '#f0e8fe' }}>🛒</div>
           <div className="stat-info"><h3>{cart.total_items}</h3><p>Cart Items</p></div>
         </div>
-      </div>
+      </motion.div>
 
       {trendingTopics && trendingTopics.length > 0 && (
-        <div className="trending-bar">
+        <motion.div className="trending-bar" variants={itemVariants}>
           <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--primary)', whiteSpace: 'nowrap' }}>
             🔥 Trending
           </span>
@@ -54,10 +78,10 @@ const Dashboard = () => {
               </div>
             </div>
           ))}
-        </div>
+        </motion.div>
       )}
 
-      <div className="mid-stats">
+      <motion.div className="mid-stats" variants={itemVariants}>
         <div className="stat-card-sm card-3d-tilt shadow-3d">
           <span className="stat-label">Media Items</span>
           <span className="stat-value">{dashboard.total_media}</span>
@@ -74,10 +98,10 @@ const Dashboard = () => {
           <span className="stat-label">Categories</span>
           <span className="stat-value">{dashboard.total_categories}</span>
         </div>
-      </div>
+      </motion.div>
 
       {dailyReading ? (
-        <div className="daily-reading-card parallax-section card-3d">
+        <motion.div className="daily-reading-card parallax-section card-3d" variants={itemVariants}>
           <div className="parallax-layer parallax-layer-back" style={{
             width: 400, height: 400, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(0,113,227,0.12), transparent 70%)',
@@ -124,9 +148,9 @@ const Dashboard = () => {
               Notification Settings
             </button>
           </div>
-        </div>
+        </motion.div>
       ) : (
-        <div className="empty-state">
+        <motion.div className="empty-state" variants={itemVariants}>
           <div className="empty-icon">📖</div>
           <h3>Welcome to SyntraHub</h3>
           <p>Browse our worldwide library, discover podcasts and videos, schedule daily reading, or shop for books with global shipping.</p>
@@ -134,18 +158,20 @@ const Dashboard = () => {
             <button className="btn btn-primary" onClick={() => setPage('library')}>Browse Library</button>
             <button className="btn btn-outline" onClick={() => setPage('media')}>Explore Media</button>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      <h2 className="section-title text-3d">Featured Books</h2>
-      <div className="books-grid">
+      <motion.h2 className="section-title text-3d" variants={itemVariants}>Featured Books</motion.h2>
+      <motion.div className="books-grid" variants={containerVariants}>
         {dashboard.featured_books?.map(b => (
-          <BookCard key={b.id} book={b} catalogView={true} showActions={true} />
+          <motion.div key={b.id} variants={itemVariants}>
+            <BookCard book={b} catalogView={true} showActions={true} />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {dashboard.recent_orders?.length > 0 && (
-        <>
+        <motion.div variants={itemVariants}>
           <h2 className="section-title">Recent Orders</h2>
           <div className="orders-mini-list">
             {dashboard.recent_orders.map(order => (
@@ -158,9 +184,9 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

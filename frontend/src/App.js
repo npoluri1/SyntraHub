@@ -21,6 +21,7 @@ import SmartHomePage from './pages/SmartHomePage';
 import RewardsPage from './pages/RewardsPage';
 import HowItWorks from './pages/HowItWorks';
 import DailyReading from './pages/DailyReading';
+import LoginPage from './pages/LoginPage';
 import './styles.css';
 
 const pages = [
@@ -41,6 +42,7 @@ const pages = [
   { k: 'rewards', c: RewardsPage },
   { k: 'howitworks', c: HowItWorks },
   { k: 'reading', c: DailyReading },
+  { k: 'login', c: LoginPage },
 ];
 
 function AppContent() {

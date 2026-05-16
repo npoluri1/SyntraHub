@@ -5,8 +5,42 @@ from typing import Optional
 from backend.database.connection import get_db
 from backend.database.models import User
 from backend.models.schemas import UserSettings
+from backend.services.auth_service import get_current_user
 
 router = APIRouter(prefix="/api/users", tags=["Users"])
+
+
+@router.get("/me", response_model=UserSettings)
+async def get_my_settings(current_user: User = Depends(get_current_user)):
+    return UserSettings(
+        email=current_user.email,
+        notification_time=current_user.notification_time or "08:30",
+        timezone=current_user.timezone or "Asia/Kolkata",
+        email_notifications=current_user.email_notifications,
+        telegram_notifications=current_user.telegram_notifications,
+        telegram_chat_id=current_user.telegram_chat_id,
+        whatsapp_notifications=current_user.whatsapp_notifications,
+        whatsapp_number=current_user.whatsapp_number,
+    )
+
+
+@router.put("/me", response_model=UserSettings)
+async def update_my_settings(
+    settings: UserSettings, 
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    current_user.email = settings.email
+    current_user.notification_time = settings.notification_time
+    current_user.timezone = settings.timezone
+    current_user.email_notifications = settings.email_notifications
+    current_user.telegram_notifications = settings.telegram_notifications
+    current_user.telegram_chat_id = settings.telegram_chat_id
+    current_user.whatsapp_notifications = settings.whatsapp_notifications
+    current_user.whatsapp_number = settings.whatsapp_number
+
+    db.commit()
+    return settings
 
 
 @router.post("/")

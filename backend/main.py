@@ -66,8 +66,9 @@ async def startup():
         print(f"Vector index skipped: {e}")
 
 
-from backend.routes import books, reading, users, catalog, media, store, podcasts, videos, search as search_route, cricfy
+from backend.routes import books, reading, users, catalog, media, store, podcasts, videos, search as search_route, cricfy, auth
 from backend.routes import social, events, payments, smarthome, rewards, ai_content
+app.include_router(auth.router)
 app.include_router(books.router)
 app.include_router(reading.router)
 app.include_router(users.router)

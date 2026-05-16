@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import BookCard from '../components/BookCard';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 }
+  }
+};
 
 const Library = () => {
   const { catalog, categories, setPage, loadCatalog } = useApp();
@@ -23,11 +41,16 @@ const Library = () => {
   }, [cat, q, catalog]);
 
   return (
-    <div className="page page-3d">
-      <div className="page-header">
+    <motion.div 
+      className="page page-3d"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div className="page-header" variants={itemVariants}>
         <h1 className="page-title text-3d-strong">Book <span>Library</span></h1>
-      </div>
-      <div className="search-bar">
+      </motion.div>
+      <motion.div className="search-bar" variants={itemVariants}>
         <div className="search-wrapper">
           <input
             type="text" placeholder="Search by title, author, description..."
@@ -41,20 +64,22 @@ const Library = () => {
             <option key={c.id} value={c.slug}>{c.icon} {c.name}</option>
           ))}
         </select>
-      </div>
-      <div className="books-grid">
+      </motion.div>
+      <motion.div className="books-grid" variants={containerVariants}>
         {filtered.map(b => (
-          <BookCard key={b.id} book={b} catalogView={true} showActions={true} />
+          <motion.div key={b.id} variants={itemVariants}>
+            <BookCard book={b} catalogView={true} showActions={true} />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
       {filtered.length === 0 && (
-        <div className="empty-state">
+        <motion.div className="empty-state" variants={itemVariants}>
           <div className="empty-icon">📚</div>
           <h3>No Books Found</h3>
           <p>Try a different search or category filter</p>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

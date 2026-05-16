@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import AiMediaPlaceholder from './AiMediaPlaceholder';
 
 const ACCENTS = ['#4a4ae0', '#e040a0', '#30d158', '#ff9f0a', '#5e5ce6', '#ff375f', '#64d2ff'];
 
@@ -30,7 +31,10 @@ const MediaCard = ({ item }) => {
             title={item.title} 
             allowFullScreen 
             loading="lazy" 
-            onError={() => setShowEmbed(false)}
+            onError={() => {
+              setShowEmbed(false);
+              setThumbError(true); // If embed fails, maybe thumb fails too
+            }}
           />
           <button className="btn-close-embed" onClick={() => setShowEmbed(false)}>×</button>
         </div>
@@ -46,14 +50,12 @@ const MediaCard = ({ item }) => {
           <img src={item.thumbnail_url} alt="" style={{ display: 'none' }} onError={() => setThumbError(true)} />
         </div>
       ) : (
-        <div 
-          className="media-placeholder" 
-          style={{ background: `linear-gradient(135deg, ${accent}33, ${accent}11)` }}
+        <AiMediaPlaceholder 
+          type={item.media_type || 'video'} 
+          accent={accent} 
+          className="media-thumb-fallback"
           onClick={() => item.embed_url ? setShowEmbed(true) : window.open(item.url, '_blank')}
-        >
-          <div className="media-placeholder-icon">{platform.icon}</div>
-          {!item.embed_url && <div className="media-placeholder-text">Click to Open</div>}
-        </div>
+        />
       )}
       <div className="media-info">
         <h3 className="media-title">{item.title}</h3>

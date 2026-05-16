@@ -139,6 +139,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, nullable=False)
+    hashed_password = Column(String(255), nullable=True)
     name = Column(String(200), nullable=True)
     phone = Column(String(50), nullable=True)
     avatar_url = Column(String(500), nullable=True)

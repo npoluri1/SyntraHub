@@ -72,7 +72,13 @@ class VectorSearchService:
                 })
 
             if documents:
-                self._collection.add(ids=ids, documents=documents, metadatas=metadatas)
+                # Process in batches to avoid batch size limits
+                batch_size = 1000
+                for i in range(0, len(documents), batch_size):
+                    batch_ids = ids[i:i+batch_size]
+                    batch_docs = documents[i:i+batch_size]
+                    batch_metas = metadatas[i:i+batch_size]
+                    self._collection.add(ids=batch_ids, documents=batch_docs, metadatas=batch_metas)
             return len(documents)
         except Exception as e:
             print(f"Index error: {e}")

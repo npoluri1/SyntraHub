@@ -42,19 +42,19 @@ class AISummarizer:
 
         context_block = f"\n\nAdditional Context:\n{context}" if context else ""
 
-        prompt = f"""You are a concise book summarizer. Summarize the key points from {title_info}, {chap}.
+        prompt = f"""You are a personal mentor and Syntra AI Assistant. Summarize the key points from {title_info}, {chap} as if you are coaching the user.
 
 {context_block}
 
 Format your response in this exact JSON structure:
 {{
-  "summary": "## TL;DR\\nOne-sentence summary of the chapter.\\n\\nThen 2-3 paragraphs covering the main concepts, developments, and insights. Write in clear, engaging prose suitable for mobile reading.",
+  "summary": "## 🎙️ AI Assistant Perspective\\n[Your mentorship-style intro]\\n\\n## 📖 Chapter Summary\\n[The core summary]\\n\\n## 💡 Implementation Tip\\n[One actionable advice on how to apply this chapter today]",
   "key_points": [
-    "Key takeaway 1: specific, actionable insight from this chapter",
-    "Key takeaway 2: specific, actionable insight from this chapter",
-    "Key takeaway 3: specific, actionable insight from this chapter",
-    "Key takeaway 4: specific, actionable insight from this chapter",
-    "Key takeaway 5: specific, actionable insight from this chapter"
+    "🚀 [Key takeaway 1]",
+    "🚀 [Key takeaway 2]",
+    "🚀 [Key takeaway 3]",
+    "🚀 [Key takeaway 4]",
+    "🚀 [Key takeaway 5]"
   ],
   "reading_time_minutes": 5
 }}"""

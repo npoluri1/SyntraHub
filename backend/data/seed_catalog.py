@@ -1,6 +1,12 @@
 import sys
+import io
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+# Fix Windows console encoding for emoji characters
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 from backend.database.connection import SessionLocal, init_db
 from backend.database.models import (
@@ -83,18 +89,27 @@ def seed():
                 ("Accessories", "accessories", "Bags, belts & jewelry", "👜"),
             ]),
         ]
+        category_map = {c.slug: c for c in db.query(Category).all()}
         parent_map = {}
         for name, slug, desc, icon, subs in categories_data:
-            parent = Category(name=name, slug=slug, description=desc, icon=icon)
-            db.add(parent)
-            db.flush()
+            if slug in category_map:
+                parent = category_map[slug]
+            else:
+                parent = Category(name=name, slug=slug, description=desc, icon=icon)
+                db.add(parent)
+                db.flush()
+                category_map[slug] = parent
+            
             parent_map[name] = parent
             for sub_name, sub_slug, sub_desc, sub_icon in subs:
-                sub = Category(name=sub_name, slug=sub_slug, description=sub_desc, icon=sub_icon, parent_id=parent.id)
-                db.add(sub)
+                if sub_slug not in category_map:
+                    sub = Category(name=sub_name, slug=sub_slug, description=sub_desc, icon=sub_icon, parent_id=parent.id)
+                    db.add(sub)
+                    db.flush()
+                    category_map[sub_slug] = sub
         db.flush()
 
-        category_map = {c.name: c for c in db.query(Category).all()}
+        category_map_by_name = {c.name: c for c in db.query(Category).all()}
 
         book_meta = [
             ("Atomic Habits", "James Clear", ["Habits","Motivation"], 14.99, "An Easy & Proven Way to Build Good Habits & Break Bad Ones", "Avery", 2018, 320),
@@ -292,28 +307,35 @@ def seed():
         for i, (book, cats) in enumerate(all_products):
             add_cover(book, i, book.title)
             for cat_name in cats:
-                if cat_name in category_map:
+                if cat_name in category_map_by_name:
                     try:
-                        db.execute(book_categories.insert().values(book_id=book.id, category_id=category_map[cat_name].id))
+                        db.execute(book_categories.insert().values(book_id=book.id, category_id=category_map_by_name[cat_name].id))
                     except:
                         pass
         
         db.flush()
 
+        # Clear existing media and podcasts to avoid duplicates with verified IDs
+        db.query(MediaContent).delete()
+        db.query(PodcastEpisode).delete()
+        db.query(PlaylistVideo).delete()
+        db.query(VideoPlaylist).delete()
+        db.commit()
+
         media_data = [
             ("Atomic Habits: The Power of 1%", "video", "youtube", "https://youtu.be/PZ7lDrwYdZc", "https://www.youtube.com/embed/PZ7lDrwYdZc", "James Clear", ["habits","productivity"], 1),
             ("Thinking, Fast and Slow Explained", "video", "youtube", "https://youtu.be/UGm6oGj7T14", "https://www.youtube.com/embed/UGm6oGj7T14", "Daniel Kahneman", ["psychology","thinking"], 1),
             ("Deep Work by Cal Newport - Summary", "video", "youtube", "https://youtu.be/3E7hkPZ-HTk", "https://www.youtube.com/embed/3E7hkPZ-HTk", "Cal Newport", ["deep work","focus"], 1),
-            ("Think and Grow Rich - Napoleon Hill", "video", "youtube", "https://youtu.be/6M2nU6XAp_M", "https://www.youtube.com/embed/6M2nU6XAp_M", "Napoleon Hill", ["success","wealth"], 1),
-            ("The Alchemist by Paulo Coelho Summary", "video", "youtube", "https://youtu.be/3g0rGJzft7M", "https://www.youtube.com/embed/3g0rGJzft7M", "Paulo Coelho", ["alchemist","fiction"], 1),
-            ("Rich Dad Poor Dad Full Summary", "video", "youtube", "https://youtu.be/8YitV4YeBn0", "https://www.youtube.com/embed/8YitV4YeBn0", "Robert Kiyosaki", ["finance","investing"], 1),
+            ("Think and Grow Rich - Napoleon Hill", "video", "youtube", "https://youtu.be/yDOhS6UwHcU", "https://www.youtube.com/embed/yDOhS6UwHcU", "Napoleon Hill", ["success","wealth"], 1),
+            ("The Alchemist by Paulo Coelho Summary", "video", "youtube", "https://youtu.be/CH1oHxyUZiA", "https://www.youtube.com/embed/CH1oHxyUZiA", "Paulo Coelho", ["alchemist","fiction"], 1),
+            ("Rich Dad Poor Dad Full Summary", "video", "youtube", "https://youtu.be/ZoxeFHAfXao", "https://www.youtube.com/embed/ZoxeFHAfXao", "Robert Kiyosaki", ["finance","investing"], 1),
             ("The Power of Habit - Charles Duhigg", "video", "youtube", "https://youtu.be/9qiG5Vjrcto", "https://www.youtube.com/embed/9qiG5Vjrcto", "Charles Duhigg", ["habits","behavior"], 1),
             ("Man's Search for Meaning - Viktor Frankl", "video", "youtube", "https://youtu.be/Rg2lFASdGdE", "https://www.youtube.com/embed/Rg2lFASdGdE", "Viktor Frankl", ["meaning","psychology"], 1),
             ("1984 by George Orwell Summary", "video", "youtube", "https://youtu.be/Yo9UJjMvHqA", "https://www.youtube.com/embed/Yo9UJjMvHqA", "George Orwell", ["dystopia","fiction"], 1),
             ("The Psychology of Money - Morgan Housel", "video", "youtube", "https://youtu.be/Hj02mRf7G6I", "https://www.youtube.com/embed/Hj02mRf7G6I", "Morgan Housel", ["money","psychology"], 1),
             ("Meditations of Marcus Aurelius Summary", "video", "youtube", "https://youtu.be/7oKqgQmXXDM", "https://www.youtube.com/embed/7oKqgQmXXDM", "Marcus Aurelius", ["stoicism","philosophy"], 1),
             ("The Subtle Art of Not Giving a F*ck", "video", "youtube", "https://youtu.be/ltf0A_TnM4s", "https://www.youtube.com/embed/ltf0A_TnM4s", "Mark Manson", ["self-help","motivation"], 1),
-            ("Sapiens: A Brief History of Humankind", "video", "youtube", "https://youtu.be/Mm2A1vxIcsM", "https://www.youtube.com/embed/Mm2A1vxIcsM", "Yuval Noah Harari", ["history","science"], 1),
+            ("Sapiens: A Brief History of Humankind", "video", "youtube", "https://youtu.be/CjVQJirIrG0", "https://www.youtube.com/embed/CjVQJirIrG0", "Yuval Noah Harari", ["history","science"], 1),
             ("Can't Hurt Me - David Goggins Mindset", "video", "youtube", "https://youtu.be/5tSTk1803Vc", "https://www.youtube.com/embed/5tSTk1803Vc", "David Goggins", ["motivation","mindset"], 1),
             ("100M Entrepreneurs - Naval Ravikant", "video", "youtube", "https://youtu.be/k8ViN5FlXmI", "https://www.youtube.com/embed/k8ViN5FlXmI", "Naval Ravikant", ["entrepreneurship","wealth"], 1),
             ("iPhone 15 Pro Max Review", "video", "youtube", "https://youtu.be/xqyUdVx4q4U", "https://www.youtube.com/embed/xqyUdVx4q4U", "MKBHD", ["iphone","apple"], 1),
@@ -365,7 +387,7 @@ def seed():
             ("BookTube Essentials", "Curated book reviews and deep dives", "youtube", "BookTube Channel", "https://youtube.com/@booktube", True, 0, [
                 ("Atomic Habits Book Review", "https://youtu.be/PZ7lDrwYdZc", "https://www.youtube.com/embed/PZ7lDrwYdZc", 15, "youtube"),
                 ("Sapiens in 10 Minutes", "https://youtu.be/CjVQJirIrG0", "https://www.youtube.com/embed/CjVQJirIrG0", 10, "youtube"),
-                ("Deep Work Summary", "https://youtu.be/gTa4gVBzR5k", "https://www.youtube.com/embed/3E7hkPZ-HTk", 12, "youtube"),
+                ("Deep Work Summary", "https://youtu.be/3E7hkPZ-HTk", "https://www.youtube.com/embed/3E7hkPZ-HTk", 12, "youtube"),
                 ("Think and Grow Rich Guide", "https://youtu.be/yDOhS6UwHcU", "https://www.youtube.com/embed/yDOhS6UwHcU", 20, "youtube"),
                 ("The Alchemist Explained", "https://youtu.be/CH1oHxyUZiA", "https://www.youtube.com/embed/CH1oHxyUZiA", 8, "youtube"),
                 ("Rich Dad Poor Dad Full Review", "https://youtu.be/ZoxeFHAfXao", "https://www.youtube.com/embed/ZoxeFHAfXao", 18, "youtube"),

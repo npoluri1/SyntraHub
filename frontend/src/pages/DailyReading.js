@@ -1,6 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import Icon from '../components/Icon';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 }
+  }
+};
 
 function DailyReading() {
   const [data, setData] = useState(null);
@@ -19,13 +39,18 @@ function DailyReading() {
   }
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <motion.div 
+      className="page-container"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div className="page-header" variants={itemVariants}>
         <h1><Icon name="book" /> Daily Reading</h1>
         <p>Track your daily book summaries, streak, and progress</p>
-      </div>
+      </motion.div>
 
-      <div className="reading-stats-row">
+      <motion.div className="reading-stats-row" variants={itemVariants}>
         <div className="stat-card glow-card">
           <div className="stat-icon"><Icon name="star" /></div>
           <div className="stat-value">{data?.streak || 0}</div>
@@ -41,14 +66,18 @@ function DailyReading() {
           <div className="stat-value">{data?.upcoming?.length || 0}</div>
           <div className="stat-label">Active Books</div>
         </div>
-      </div>
+      </motion.div>
 
       {data?.upcoming?.length > 0 && (
-        <section className="reading-section">
+        <motion.section className="reading-section" variants={itemVariants}>
           <h2><Icon name="calendar" /> Today's Reading Queue</h2>
           <div className="upcoming-list">
             {data.upcoming.map((u, i) => (
-              <div key={i} className="upcoming-card glow-card card-3d">
+              <motion.div 
+                key={i} 
+                className="upcoming-card glow-card card-3d"
+                whileHover={{ scale: 1.02, y: -5 }}
+              >
                 <div className="upcoming-info">
                   <h3>{u.book_title}</h3>
                   <p className="upcoming-author">by {u.book_author}</p>
@@ -65,13 +94,13 @@ function DailyReading() {
                 >
                   <Icon name="play" /> Read Now
                 </button>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
       )}
 
-      <section className="reading-section">
+      <motion.section className="reading-section" variants={itemVariants}>
         <h2><Icon name="calendar" /> Reading Calendar (Last 30 Days)</h2>
         <div className="calendar-grid">
           {data?.calendar?.map((d, i) => (
@@ -85,14 +114,19 @@ function DailyReading() {
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {data?.history?.length > 0 && (
         <section className="reading-section">
           <h2><Icon name="clock" /> Reading History</h2>
-          <div className="history-list">
+          <motion.div className="history-list" variants={containerVariants}>
             {data.history.map((h, i) => (
-              <div key={h.id || i} className="history-card glow-card card-3d fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
+              <motion.div 
+                key={h.id || i} 
+                className="history-card glow-card card-3d"
+                variants={itemVariants}
+                whileHover={{ scale: 1.01, x: 5 }}
+              >
                 <div className="history-header">
                   <h3>{h.book_title}</h3>
                   <span className="history-date">{h.date}</span>
@@ -110,23 +144,23 @@ function DailyReading() {
                   </details>
                 )}
                 <p className="history-meta">{h.reading_time_minutes} min read</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
       )}
 
       {(!data?.history || data.history.length === 0) && (
-        <div className="empty-reading glow-card">
+        <motion.div className="empty-reading glow-card" variants={itemVariants}>
           <Icon name="book" style={{ fontSize: '3rem', opacity: 0.5 }} />
           <h3>No reading history yet</h3>
           <p>Schedule a book from the Library to start receiving daily summaries!</p>
           <button className="btn btn-primary" onClick={() => window.location.href = '/?page=library'}>
             <Icon name="plus" /> Browse Library
           </button>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

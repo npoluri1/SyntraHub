@@ -108,12 +108,16 @@ async def _send_notifications():
                 key_points = chapter.key_points or []
 
                 if user.email_notifications and user.email:
+                    # AI Agent Personalized Intro
+                    ai_intro = f"Good morning, {user.name}! I'm your Syntra AI Assistant. Here's your curated reading for today."
+                    ai_outro = "I'll be back tomorrow with your next chapter. Happy reading!"
+                    
                     email_notifier.send_daily_reading(
                         to_email=user.email,
                         book_title=book.title,
                         chapter_num=next_chapter,
                         chapter_title=chapter.chapter_title,
-                        summary=chapter.summary,
+                        summary=f"{ai_intro}\n\n{chapter.summary}\n\n{ai_outro}",
                         key_points=key_points,
                     )
 

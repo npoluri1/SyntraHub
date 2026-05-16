@@ -26,7 +26,7 @@ const mainTabs = navItems.slice(0, 5);
 const moreTabs = navItems.slice(5);
 
 const Navbar = () => {
-  const { page, setPage, cart, selectedCurrency, currencies, changeCurrency } = useApp();
+  const { page, setPage, cart, selectedCurrency, currencies, changeCurrency, authToken, handleLogout, user } = useApp();
   const [showMore, setShowMore] = useState(false);
 
   return (
@@ -56,6 +56,20 @@ const Navbar = () => {
             <select className="currency-select" value={selectedCurrency} onChange={e => changeCurrency(e.target.value)}>
               {currencies.map(c => <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>)}
             </select>
+            
+            {authToken ? (
+              <div className="user-profile-nav">
+                <span className="user-name">{user?.name}</span>
+                <button className="btn btn-sm btn-outline" onClick={handleLogout}>
+                  <Icon name="logout" size={16} /> Logout
+                </button>
+              </div>
+            ) : (
+              <button className="btn btn-sm btn-primary" onClick={() => setPage('login')}>
+                <Icon name="user" size={16} /> Login
+              </button>
+            )}
+
             <button className="mobile-menu-btn" onClick={() => setShowMore(!showMore)}>
               <Icon name="menu" size={22} />
             </button>
