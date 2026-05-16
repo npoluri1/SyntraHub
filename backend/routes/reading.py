@@ -190,3 +190,86 @@ async def send_todays_reading(
         results.append({"channel": "whatsapp", "status": "sent" if ok else "failed"})
 
     return {"results": results}
+
+
+@router.get("/history")
+async def get_reading_history(
+    user_id: int = Query(1),
+    days: int = Query(30),
+    db: Session = Depends(get_db),
+):
+    from datetime import timedelta
+    cutoff = date.today() - timedelta(days=days)
+    summaries = db.query(ChapterDB, Book).join(
+        Book, ChapterDB.book_id == Book.id
+    ).filter(
+        ChapterDB.is_sent == True,
+        ChapterDB.scheduled_date >= cutoff.isoformat(),
+    ).order_by(ChapterDB.scheduled_date.desc(), ChapterDB.chapter_number.asc()).all()
+
+    seen_dates = set()
+    history = []
+    for ch, bk in summaries:
+        d = ch.scheduled_date
+        seen_dates.add(d)
+        history.append({
+            "id": ch.id,
+            "book_title": bk.title,
+            "book_author": bk.author,
+            "chapter_number": ch.chapter_number,
+            "chapter_title": ch.chapter_title,
+            "summary": ch.summary[:200] + "..." if len(ch.summary) > 200 else ch.summary,
+            "key_points": ch.key_points or [],
+            "reading_time_minutes": ch.reading_time_minutes or 5,
+            "date": d,
+            "created_at": ch.created_at.isoformat() if ch.created_at else None,
+        })
+
+    schedules = db.query(ReadingSchedule).filter(
+        ReadingSchedule.user_id == user_id,
+        ReadingSchedule.is_active == True,
+    ).all()
+    upcoming = []
+    for s in schedules:
+        bk = db.query(Book).filter(Book.id == s.book_id).first()
+        if not bk:
+            continue
+        nc = s.current_chapter + 1
+        progress = round((nc / (bk.total_chapters or 1)) * 100, 1) if bk.total_chapters else 0
+        upcoming.append({
+            "book_title": bk.title,
+            "book_author": bk.author,
+            "next_chapter": nc,
+            "total_chapters": bk.total_chapters or 0,
+            "progress": progress,
+            "is_active": s.is_active,
+        })
+
+    all_dates = []
+    d = cutoff
+    today = date.today()
+    while d <= today:
+        d_str = d.isoformat()
+        all_dates.append({
+            "date": d_str,
+            "has_reading": d_str in seen_dates,
+            "is_today": d_str == today.isoformat(),
+        })
+        d += timedelta(days=1)
+
+    streak = 0
+    check = date.today()
+    while check >= cutoff:
+        if check.isoformat() in seen_dates:
+            streak += 1
+        else:
+            if check != date.today():
+                break
+        check -= timedelta(days=1)
+
+    return {
+        "history": history,
+        "calendar": all_dates,
+        "streak": streak,
+        "upcoming": upcoming,
+    }

@@ -14,7 +14,12 @@ const BookCard = ({ book, catalogView = false, showActions = true }) => {
       onClick={() => catalogView && setPage('book-' + book.id)}
     >
       {catalogView && book.images?.length > 0 && (
-        <img src={book.images[0]?.url} alt={book.title} className="book-cover book-cover-3d" />
+        <img
+          src={book.images[0]?.url}
+          alt={book.title}
+          className="book-cover book-cover-3d"
+          onError={(e) => { e.target.src = `https://placehold.co/400x600/1e40af/ffffff?text=${encodeURIComponent(book.title.substring(0, 20))}`; }}
+        />
       )}
       <div className="book-card-header">
         <h3>{book.title}</h3>

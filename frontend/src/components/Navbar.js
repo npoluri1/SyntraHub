@@ -17,6 +17,7 @@ const navItems = [
   { k: 'events', i: 'events', l: 'Events' },
   { k: 'payments', i: 'payments', l: 'Payments' },
   { k: 'smarthome', i: 'smarthome', l: 'Smart' },
+  { k: 'reading', i: 'book', l: 'Daily Read' },
   { k: 'howitworks', i: 'howitworks', l: 'How It Works' },
   { k: 'rewards', i: 'rewards', l: 'Rewards' },
 ];

@@ -137,6 +137,23 @@ async def _send_notifications():
                         key_points=key_points,
                     )
 
+                missed = db.query(ChapterDB).filter(
+                    ChapterDB.book_id == book.id,
+                    ChapterDB.is_sent == True,
+                ).order_by(ChapterDB.scheduled_date.desc()).first()
+                if missed and missed.scheduled_date:
+                    from datetime import timedelta
+                    missed_date = datetime.strptime(missed.scheduled_date, "%Y-%m-%d").date()
+                    days_missed = (date.today() - missed_date).days - 1
+                    if days_missed > 0 and user.email_notifications and user.email:
+                        email_notifier.send_email(
+                            to_email=user.email,
+                            subject=f"⚠️ You missed {days_missed} day(s) reading {book.title}",
+                            html_content=f"<p>Your last reading was on {missed.scheduled_date}. "
+                            f"<br>Catch up with Chapter {next_chapter} today!</p>"
+                            f"<p><a href='https://syntrahub.onrender.com'>Open SyntraHub</a></p>",
+                        )
+
                 if book.total_chapters and next_chapter >= book.total_chapters:
                     schedule.is_active = False
 

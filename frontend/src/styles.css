@@ -4164,3 +4164,54 @@ html {
   }
 }
 
+/* ── Daily Reading Page ── */
+.reading-stats-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { flex: 1; min-width: 140px; background: var(--card-bg, #1e1e2e); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--border, #333); position: relative; overflow: hidden; }
+.stat-icon { font-size: 1.5rem; margin-bottom: 8px; color: var(--accent, #b8860b); }
+.stat-value { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #b8860b, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-label { font-size: 0.85rem; color: var(--text-sec, #999); margin-top: 4px; }
+.reading-section { margin-bottom: 32px; }
+.reading-section h2 { font-size: 1.2rem; margin-bottom: 16px; color: var(--text, #e0e0e0); display: flex; align-items: center; gap: 8px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; background: var(--card-bg, #1e1e2e); border-radius: 16px; padding: 16px; border: 1px solid var(--border, #333); }
+.calendar-day { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 0; border-radius: 8px; font-size: 0.75rem; cursor: default; transition: transform 0.2s; }
+.calendar-day:hover { transform: scale(1.15); }
+.calendar-day.read { background: rgba(184, 134, 11, 0.2); }
+.calendar-day.missed { background: rgba(255, 55, 95, 0.08); }
+.calendar-day.today { border: 2px solid #b8860b; }
+.cal-date-num { font-weight: 700; color: var(--text, #e0e0e0); }
+.cal-dot { font-size: 0.9rem; line-height: 1; }
+.upcoming-list { display: flex; flex-direction: column; gap: 12px; }
+.upcoming-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--card-bg, #1e1e2e); border-radius: 16px; padding: 20px; border: 1px solid var(--border, #333); flex-wrap: wrap; }
+.upcoming-info { flex: 1; min-width: 200px; }
+.upcoming-info h3 { margin: 0 0 4px; font-size: 1rem; color: var(--text, #e0e0e0); }
+.upcoming-author { margin: 0 0 8px; font-size: 0.85rem; color: var(--text-sec, #999); }
+.progress-bar-container { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, #b8860b, #ffd700); border-radius: 3px; transition: width 0.5s; }
+.upcoming-meta { font-size: 0.8rem; color: var(--text-sec, #999); margin: 0; }
+.history-list { display: flex; flex-direction: column; gap: 12px; }
+.history-card { background: var(--card-bg, #1e1e2e); border-radius: 16px; padding: 20px; border: 1px solid var(--border, #333); }
+.history-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 12px; }
+.history-header h3 { margin: 0; font-size: 1rem; color: var(--text, #e0e0e0); }
+.history-date { font-size: 0.8rem; color: var(--text-sec, #999); white-space: nowrap; }
+.history-chapter { margin: 0 0 8px; font-size: 0.85rem; color: #b8860b; }
+.history-summary { margin: 0 0 8px; font-size: 0.9rem; color: var(--text-sec, #bbb); line-height: 1.6; }
+.history-details { margin-top: 8px; }
+.history-details summary { cursor: pointer; color: #b8860b; font-size: 0.85rem; margin-bottom: 8px; }
+.history-details ul { margin: 0; padding-left: 20px; }
+.history-details li { font-size: 0.85rem; color: var(--text-sec, #bbb); margin-bottom: 4px; line-height: 1.5; }
+.history-meta { margin: 8px 0 0; font-size: 0.8rem; color: var(--text-sec, #999); }
+.empty-reading { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 60px 20px; background: var(--card-bg, #1e1e2e); border-radius: 16px; border: 1px solid var(--border, #333); text-align: center; }
+.empty-reading h3 { margin: 0; color: var(--text, #e0e0e0); }
+.empty-reading p { color: var(--text-sec, #999); max-width: 400px; }
+
+.media-thumb img[style*="display: none"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.media-thumb { position: relative; }
+
+@media (max-width: 600px) {
+  .reading-stats-row { gap: 10px; }
+  .stat-card { min-width: 100px; padding: 14px; }
+  .stat-value { font-size: 1.5rem; }
+  .calendar-grid { grid-template-columns: repeat(7, 1fr); padding: 10px; gap: 4px; }
+  .calendar-day { font-size: 0.7rem; padding: 4px 0; }
+}
+

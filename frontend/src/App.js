@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AppProvider, useApp } from './context/AppContext';
@@ -19,6 +20,7 @@ import PaymentsPage from './pages/PaymentsPage';
 import SmartHomePage from './pages/SmartHomePage';
 import RewardsPage from './pages/RewardsPage';
 import HowItWorks from './pages/HowItWorks';
+import DailyReading from './pages/DailyReading';
 import './styles.css';
 
 const pages = [
@@ -38,6 +40,7 @@ const pages = [
   { k: 'smarthome', c: SmartHomePage },
   { k: 'rewards', c: RewardsPage },
   { k: 'howitworks', c: HowItWorks },
+  { k: 'reading', c: DailyReading },
 ];
 
 function AppContent() {
@@ -47,13 +50,40 @@ function AppContent() {
     for (const p of pages) {
       if (page === p.k) {
         const Component = p.c;
-        return <Component />;
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Component />
+          </motion.div>
+        );
       }
     }
     if (page && page.startsWith('book-')) {
-      return <Library />;
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Library />
+        </motion.div>
+      );
     }
-    return <Dashboard />;
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Dashboard />
+      </motion.div>
+    );
   };
 
   return (

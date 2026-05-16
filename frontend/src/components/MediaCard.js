@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const ACCENTS = ['#4a4ae0', '#e040a0', '#30d158', '#ff9f0a', '#5e5ce6', '#ff375f', '#64d2ff'];
 
@@ -12,7 +12,8 @@ const PLATFORM_CONFIG = {
 };
 
 const MediaCard = ({ item }) => {
-  const accent = useMemo(() => ACCENTS[item.id % ACCENTS.length], [item.id]);
+  const accent = useMemo(() => ACCENTS[(item.id || 0) % ACCENTS.length], [item.id]);
+  const [thumbError, setThumbError] = useState(false);
   const platform = PLATFORM_CONFIG[item.platform] || { icon: '▶️', label: item.platform, color: '#666' };
 
   return (
@@ -24,11 +25,12 @@ const MediaCard = ({ item }) => {
         <div className="media-embed">
           <iframe src={item.embed_url} title={item.title} allowFullScreen loading="lazy" />
         </div>
-      ) : item.thumbnail_url ? (
+      ) : item.thumbnail_url && !thumbError ? (
         <div className="media-thumb" style={{ backgroundImage: `url(${item.thumbnail_url})` }}>
           <div className="media-play-pulse" style={{ borderColor: platform.color }}>
             <div className="media-play" style={{ color: platform.color }}>{platform.icon}</div>
           </div>
+          <img src={item.thumbnail_url} alt="" style={{ display: 'none' }} onError={() => setThumbError(true)} />
         </div>
       ) : (
         <div className="media-placeholder" style={{ background: `linear-gradient(135deg, ${accent}33, ${accent}11)` }}>

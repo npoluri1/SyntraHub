@@ -282,6 +282,9 @@ def seed():
         db.flush()
 
         def add_cover(book, color_idx, label):
+            existing = db.query(BookImage).filter(BookImage.book_id == book.id).first()
+            if existing:
+                return
             color = COVER_COLORS[color_idx % len(COVER_COLORS)]
             cover_url = _real_img("book", 400, 600)
             db.add(BookImage(book_id=book.id, url=cover_url, alt_text=f"{book.title} cover", is_primary=True))
@@ -299,27 +302,27 @@ def seed():
 
         media_data = [
             ("Atomic Habits: The Power of 1%", "video", "youtube", "https://youtu.be/PZ7lDrwYdZc", "https://www.youtube.com/embed/PZ7lDrwYdZc", "James Clear", ["habits","productivity"], 1),
-            ("Thinking, Fast and Slow Explained", "video", "youtube", "https://youtu.be/CjVQJirIrG0", "https://www.youtube.com/embed/CjVQJirIrG0", "Daniel Kahneman", ["psychology","thinking"], 1),
-            ("Deep Work by Cal Newport - Summary", "video", "youtube", "https://youtu.be/gTa4gVBzR5k", "https://www.youtube.com/embed/gTa4gVBzR5k", "Cal Newport", ["deep work","focus"], 1),
-            ("Think and Grow Rich - Napoleon Hill", "video", "youtube", "https://youtu.be/yDOhS6UwHcU", "https://www.youtube.com/embed/yDOhS6UwHcU", "Napoleon Hill", ["success","wealth"], 1),
-            ("The Alchemist by Paulo Coelho Summary", "video", "youtube", "https://youtu.be/CH1oHxyUZiA", "https://www.youtube.com/embed/CH1oHxyUZiA", "Paulo Coelho", ["alchemist","fiction"], 1),
-            ("Rich Dad Poor Dad Full Summary", "video", "youtube", "https://youtu.be/ZoxeFHAfXao", "https://www.youtube.com/embed/ZoxeFHAfXao", "Robert Kiyosaki", ["finance","investing"], 1),
+            ("Thinking, Fast and Slow Explained", "video", "youtube", "https://youtu.be/UGm6oGj7T14", "https://www.youtube.com/embed/UGm6oGj7T14", "Daniel Kahneman", ["psychology","thinking"], 1),
+            ("Deep Work by Cal Newport - Summary", "video", "youtube", "https://youtu.be/3E7hkPZ-HTk", "https://www.youtube.com/embed/3E7hkPZ-HTk", "Cal Newport", ["deep work","focus"], 1),
+            ("Think and Grow Rich - Napoleon Hill", "video", "youtube", "https://youtu.be/6M2nU6XAp_M", "https://www.youtube.com/embed/6M2nU6XAp_M", "Napoleon Hill", ["success","wealth"], 1),
+            ("The Alchemist by Paulo Coelho Summary", "video", "youtube", "https://youtu.be/3g0rGJzft7M", "https://www.youtube.com/embed/3g0rGJzft7M", "Paulo Coelho", ["alchemist","fiction"], 1),
+            ("Rich Dad Poor Dad Full Summary", "video", "youtube", "https://youtu.be/8YitV4YeBn0", "https://www.youtube.com/embed/8YitV4YeBn0", "Robert Kiyosaki", ["finance","investing"], 1),
             ("The Power of Habit - Charles Duhigg", "video", "youtube", "https://youtu.be/9qiG5Vjrcto", "https://www.youtube.com/embed/9qiG5Vjrcto", "Charles Duhigg", ["habits","behavior"], 1),
             ("Man's Search for Meaning - Viktor Frankl", "video", "youtube", "https://youtu.be/Rg2lFASdGdE", "https://www.youtube.com/embed/Rg2lFASdGdE", "Viktor Frankl", ["meaning","psychology"], 1),
             ("1984 by George Orwell Summary", "video", "youtube", "https://youtu.be/Yo9UJjMvHqA", "https://www.youtube.com/embed/Yo9UJjMvHqA", "George Orwell", ["dystopia","fiction"], 1),
             ("The Psychology of Money - Morgan Housel", "video", "youtube", "https://youtu.be/Hj02mRf7G6I", "https://www.youtube.com/embed/Hj02mRf7G6I", "Morgan Housel", ["money","psychology"], 1),
             ("Meditations of Marcus Aurelius Summary", "video", "youtube", "https://youtu.be/7oKqgQmXXDM", "https://www.youtube.com/embed/7oKqgQmXXDM", "Marcus Aurelius", ["stoicism","philosophy"], 1),
             ("The Subtle Art of Not Giving a F*ck", "video", "youtube", "https://youtu.be/ltf0A_TnM4s", "https://www.youtube.com/embed/ltf0A_TnM4s", "Mark Manson", ["self-help","motivation"], 1),
-            ("Sapiens: A Brief History of Humankind", "video", "youtube", "https://youtu.be/CjVQJirIrG0", "https://www.youtube.com/embed/CjVQJirIrG0", "Yuval Noah Harari", ["history","science"], 1),
+            ("Sapiens: A Brief History of Humankind", "video", "youtube", "https://youtu.be/Mm2A1vxIcsM", "https://www.youtube.com/embed/Mm2A1vxIcsM", "Yuval Noah Harari", ["history","science"], 1),
             ("Can't Hurt Me - David Goggins Mindset", "video", "youtube", "https://youtu.be/5tSTk1803Vc", "https://www.youtube.com/embed/5tSTk1803Vc", "David Goggins", ["motivation","mindset"], 1),
             ("100M Entrepreneurs - Naval Ravikant", "video", "youtube", "https://youtu.be/k8ViN5FlXmI", "https://www.youtube.com/embed/k8ViN5FlXmI", "Naval Ravikant", ["entrepreneurship","wealth"], 1),
             ("iPhone 15 Pro Max Review", "video", "youtube", "https://youtu.be/xqyUdVx4q4U", "https://www.youtube.com/embed/xqyUdVx4q4U", "MKBHD", ["iphone","apple"], 1),
             ("Samsung Galaxy S24 Ultra Review", "video", "youtube", "https://youtu.be/iDKvwFngMfs", "https://www.youtube.com/embed/iDKvwFngMfs", "MKBHD", ["samsung","galaxy"], 1),
             ("MacBook Pro M3 Max Review", "video", "youtube", "https://youtu.be/ZTpibWwGZg", "https://www.youtube.com/embed/ZTpibWwGZg", "MKBHD", ["macbook","apple"], 1),
-            ("BookTok: 5 Books That Changed My Life", "video", "tiktok", "https://www.tiktok.com/@booktok/v/1", None, "BookTok", ["books","reading"], 1),
-            ("Bookstagram: Daily Reading Routine", "video", "instagram", "https://www.instagram.com/reel/book1", None, "Bookstagram", ["reading","habits"], 1),
-            ("YouTube Shorts: Atomic Habits in 60s", "video", "youtube", "https://youtube.com/shorts/short1", "https://www.youtube.com/embed/shorts/short1", "BookShorts", ["shorts","habits"], 1),
-            ("Facebook: Top 10 Books of 2024", "video", "facebook", "https://facebook.com/bookclub/video/1", None, "BookClub", ["books","top10"], 1),
+            ("BookTok: 5 Books That Changed My Life", "video", "tiktok", "https://www.tiktok.com/@booktok", None, "BookTok", ["books","reading"], 1),
+            ("Bookstagram: Daily Reading Routine", "video", "instagram", "https://www.instagram.com/reel/Cx1", None, "Bookstagram", ["reading","habits"], 1),
+            ("YouTube Shorts: Atomic Habits in 60s", "video", "youtube", "https://youtu.be/PZ7lDrwYdZc", "https://www.youtube.com/embed/PZ7lDrwYdZc", "BookShorts", ["shorts","habits"], 1),
+            ("Facebook: Top 10 Books of 2024", "video", "facebook", "https://fb.watch/bookclub", None, "BookClub", ["books","top10"], 1),
             ("The 5 AM Club - Robin Sharma", "video", "youtube", "https://youtu.be/feFw7JpBiIU", "https://www.youtube.com/embed/feFw7JpBiIU", "Robin Sharma", ["habits","morning"], 1),
             ("Ikigai: The Japanese Secret", "video", "youtube", "https://youtu.be/Zm7oQfsWP2o", "https://www.youtube.com/embed/Zm7oQfsWP2o", "Hector Garcia", ["ikigai","japan"], 1),
         ]
