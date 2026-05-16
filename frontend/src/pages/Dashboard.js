@@ -4,7 +4,7 @@ import BookCard from '../components/BookCard';
 
 const Dashboard = () => {
   const { dashboard, dailyReading, schedules, cart, selectedCurrency,
-    currencies, trendingTopics, handleSendNotification, setPage } = useApp();
+    currencies, trendingTopics, dailyInsight, handleSendNotification, setPage } = useApp();
 
   const pct = (c, t) => t ? Math.round((c / t) * 100) : 0;
   const activeSchedules = schedules.filter(s => s.is_active).length;
@@ -107,7 +107,9 @@ const Dashboard = () => {
               </svg>
             </div>
           </div>
-          <div className="reading-summary"><p>{dailyReading.summary}</p></div>
+          <div className="reading-summary">
+            <p><TypingText text={dailyReading.summary} speed={20} /></p>
+          </div>
           {dailyReading.key_points?.length > 0 && (
             <div className="reading-points">
               <h3>Key Takeaways</h3>

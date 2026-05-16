@@ -145,14 +145,21 @@ async def _send_notifications():
                     from datetime import timedelta
                     missed_date = datetime.strptime(missed.scheduled_date, "%Y-%m-%d").date()
                     days_missed = (date.today() - missed_date).days - 1
-                    if days_missed > 0 and user.email_notifications and user.email:
-                        email_notifier.send_email(
-                            to_email=user.email,
-                            subject=f"⚠️ You missed {days_missed} day(s) reading {book.title}",
-                            html_content=f"<p>Your last reading was on {missed.scheduled_date}. "
-                            f"<br>Catch up with Chapter {next_chapter} today!</p>"
-                            f"<p><a href='https://syntrahub.onrender.com'>Open SyntraHub</a></p>",
-                        )
+                    if days_missed > 0:
+                        alert_msg = f"⚠️ You missed {days_missed} day(s) reading {book.title}! Your last reading was on {missed.scheduled_date}. Catch up with Chapter {next_chapter} today!"
+                        
+                        if user.email_notifications and user.email:
+                            email_notifier.send_email(
+                                to_email=user.email,
+                                subject=f"⚠️ You missed {days_missed} day(s) reading {book.title}",
+                                html_content=f"<p>{alert_msg}</p><p><a href='https://syntrahub.onrender.com'>Open SyntraHub</a></p>",
+                            )
+                        
+                        if user.telegram_notifications and user.telegram_chat_id:
+                            telegram_notifier.send_message(user.telegram_chat_id, alert_msg)
+                            
+                        if user.whatsapp_notifications and user.whatsapp_number:
+                            whatsapp_notifier.send_message(user.whatsapp_number, alert_msg)
 
                 if book.total_chapters and next_chapter >= book.total_chapters:
                     schedule.is_active = False

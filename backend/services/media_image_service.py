@@ -12,7 +12,11 @@ PHOTO_IDS = [
 
 COVER_COLORS = ["1e40af","059669","d97706","dc2626","7c3aed","db2777","0891b2","4f46e5"]
 
-IMAGE_PROVIDERS = []
+IMAGE_PROVIDERS = [
+    lambda w, h, t: f"https://picsum.photos/{w}/{h}?random={random.randint(1,99999)}",
+    lambda w, h, t: f"https://source.unsplash.com/random/{w}x{h}?{t or 'books'}",
+    lambda w, h, t: f"https://placehold.co/{w}x{h}/{random.choice(COVER_COLORS)}/ffffff?text={t or 'Book'}",
+]
 
 
 def _picsum_url(width: int, height: int) -> str:
@@ -22,15 +26,19 @@ def _picsum_url(width: int, height: int) -> str:
 
 def _placehold_url(width: int, height: int, text: str = "") -> str:
     color = random.choice(COVER_COLORS)
-    safe_text = text.replace(" ", "%20") if text else "Image"
+    safe_text = (text or "Image").replace(" ", "%20")
     return f"https://placehold.co/{width}x{height}/{color}/ffffff?text={safe_text}"
 
 
 def get_media_image(media_type: str = "default", width: int = 640, height: int = 360) -> Dict:
-    picsum_url = _picsum_url(width, height)
+    # Try multiple providers or return primary with fallbacks
+    primary_url = _picsum_url(width, height)
+    secondary_url = f"https://source.unsplash.com/random/{width}x{height}?{media_type}"
     fallback_url = _placehold_url(width, height, media_type.capitalize())
+    
     return {
-        "url": picsum_url,
+        "url": primary_url,
+        "secondary_url": secondary_url,
         "fallback_url": fallback_url,
         "media_type": media_type,
         "width": width,

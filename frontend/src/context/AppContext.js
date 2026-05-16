@@ -57,6 +57,7 @@ export const AppProvider = ({ children }) => {
   const [aiColors, setAiColors] = useState(null);
   const [trendingTopics, setTrendingTopics] = useState([]);
   const intervalRef = useRef(null);
+  const pollingRef = useRef(null);
 
   const USER_ID = 1;
 
@@ -78,8 +79,21 @@ export const AppProvider = ({ children }) => {
     loadInitialData();
     loadAIColors();
     loadTrendingTopics();
+    
+    // Theme refresh every 10 mins
     intervalRef.current = setInterval(() => loadAIColors(), 600000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    
+    // Realtime polling
+    pollingRef.current = setInterval(() => {
+      loadCricfyMatches();
+      loadTrendingTopics();
+      if (page === 'dashboard') loadDashboard();
+    }, 30000); // 30 seconds
+
+    return () => { 
+      if (intervalRef.current) clearInterval(intervalRef.current); 
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -243,13 +257,20 @@ export const AppProvider = ({ children }) => {
     orders, shippingZones, currencies, countries, cricfyMatches,
     selectedCurrency, changeCurrency,
     dashboard, loading,
-    aiColors, trendingTopics,
+    aiColors, trendingTopics, dailyInsight,
     USER_ID,
     loadCatalog, loadCategories, loadDailyReading,
     loadSchedules, loadCart, loadMedia, loadPodcasts,
     loadPlaylists, loadCricfyMatches, loadOrders, loadDashboard,
     loadAIColors, loadTrendingTopics,
     handleScheduleBook, handleAdvanceChapter,
+    handleAddToCart, handleRemoveFromCart,
+    handleSendNotification,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+handleAdvanceChapter,
     handleAddToCart, handleRemoveFromCart,
     handleSendNotification,
   };

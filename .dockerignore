@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+.env
+.git
+.gitignore
+node_modules
+frontend/node_modules
+frontend/src
+backend/data/*.db
+backend/data/chroma_db
+backend/data/cricket_cache.json
+*.md
+.DS_Store

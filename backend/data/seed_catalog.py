@@ -365,7 +365,7 @@ def seed():
             ("BookTube Essentials", "Curated book reviews and deep dives", "youtube", "BookTube Channel", "https://youtube.com/@booktube", True, 0, [
                 ("Atomic Habits Book Review", "https://youtu.be/PZ7lDrwYdZc", "https://www.youtube.com/embed/PZ7lDrwYdZc", 15, "youtube"),
                 ("Sapiens in 10 Minutes", "https://youtu.be/CjVQJirIrG0", "https://www.youtube.com/embed/CjVQJirIrG0", 10, "youtube"),
-                ("Deep Work Summary", "https://youtu.be/gTa4gVBzR5k", "https://www.youtube.com/embed/gTa4gVBzR5k", 12, "youtube"),
+                ("Deep Work Summary", "https://youtu.be/gTa4gVBzR5k", "https://www.youtube.com/embed/3E7hkPZ-HTk", 12, "youtube"),
                 ("Think and Grow Rich Guide", "https://youtu.be/yDOhS6UwHcU", "https://www.youtube.com/embed/yDOhS6UwHcU", 20, "youtube"),
                 ("The Alchemist Explained", "https://youtu.be/CH1oHxyUZiA", "https://www.youtube.com/embed/CH1oHxyUZiA", 8, "youtube"),
                 ("Rich Dad Poor Dad Full Review", "https://youtu.be/ZoxeFHAfXao", "https://www.youtube.com/embed/ZoxeFHAfXao", 18, "youtube"),
@@ -397,7 +397,7 @@ def seed():
             ]),
             ("Author Interviews", "Conversations with top authors", "youtube", "Author Spotlight", "https://youtube.com/@authorspotlight", True, 4, [
                 ("James Clear on Atomic Habits", "https://youtu.be/PZ7lDrwYdZc", "https://www.youtube.com/embed/PZ7lDrwYdZc", 30, "youtube"),
-                ("Cal Newport on Deep Work", "https://youtu.be/gTa4gVBzR5k", "https://www.youtube.com/embed/gTa4gVBzR5k", 25, "youtube"),
+                ("Cal Newport on Deep Work", "https://youtu.be/gTa4gVBzR5k", "https://www.youtube.com/embed/3E7hkPZ-HTk", 25, "youtube"),
                 ("Morgan Housel on Psychology of Money", "https://youtu.be/Hj02mRf7G6I", "https://www.youtube.com/embed/Hj02mRf7G6I", 28, "youtube"),
                 ("David Goggins on Discipline", "https://youtu.be/5tSTk1803Vc", "https://www.youtube.com/embed/5tSTk1803Vc", 35, "youtube"),
                 ("Naval Ravikant on Wealth", "https://youtu.be/k8ViN5FlXmI", "https://www.youtube.com/embed/k8ViN5FlXmI", 45, "youtube"),

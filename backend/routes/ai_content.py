@@ -33,6 +33,22 @@ def get_content_blurb(content_type: str = "default", category: Optional[str] = N
     return generate_content_blurb(content_type, category)
 
 
+@router.get("/daily-insight")
+def get_daily_insight():
+    import random
+    insights = [
+        "The best way to predict the future is to create it.",
+        "Your only limit is your mind.",
+        "Consistency is more important than perfection.",
+        "A book is a dream that you hold in your hand.",
+        "The mind is not a vessel to be filled, but a fire to be kindled.",
+        "Knowledge is power. Information is liberating.",
+        "Discipline is the bridge between goals and accomplishment.",
+        "The only way to do great work is to love what you do.",
+    ]
+    return {"insight": random.choice(insights), "author": "Syntra AI"}
+
+
 @router.get("/trending-topics")
 def get_trending_topics():
     topics = [

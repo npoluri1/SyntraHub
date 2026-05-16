@@ -14,6 +14,7 @@ const PLATFORM_CONFIG = {
 const MediaCard = ({ item }) => {
   const accent = useMemo(() => ACCENTS[(item.id || 0) % ACCENTS.length], [item.id]);
   const [thumbError, setThumbError] = useState(false);
+  const [showEmbed, setShowEmbed] = useState(false);
   const platform = PLATFORM_CONFIG[item.platform] || { icon: '▶️', label: item.platform, color: '#666' };
 
   return (
@@ -21,20 +22,37 @@ const MediaCard = ({ item }) => {
       <div className="media-platform-badge" style={{ background: platform.color }}>
         {platform.icon} {platform.label}
       </div>
-      {item.embed_url ? (
+      
+      {item.embed_url && showEmbed ? (
         <div className="media-embed">
-          <iframe src={item.embed_url} title={item.title} allowFullScreen loading="lazy" />
+          <iframe 
+            src={item.embed_url} 
+            title={item.title} 
+            allowFullScreen 
+            loading="lazy" 
+            onError={() => setShowEmbed(false)}
+          />
+          <button className="btn-close-embed" onClick={() => setShowEmbed(false)}>×</button>
         </div>
       ) : item.thumbnail_url && !thumbError ? (
-        <div className="media-thumb" style={{ backgroundImage: `url(${item.thumbnail_url})` }}>
+        <div 
+          className="media-thumb" 
+          style={{ backgroundImage: `url(${item.thumbnail_url})` }}
+          onClick={() => item.embed_url ? setShowEmbed(true) : window.open(item.url, '_blank')}
+        >
           <div className="media-play-pulse" style={{ borderColor: platform.color }}>
             <div className="media-play" style={{ color: platform.color }}>{platform.icon}</div>
           </div>
           <img src={item.thumbnail_url} alt="" style={{ display: 'none' }} onError={() => setThumbError(true)} />
         </div>
       ) : (
-        <div className="media-placeholder" style={{ background: `linear-gradient(135deg, ${accent}33, ${accent}11)` }}>
+        <div 
+          className="media-placeholder" 
+          style={{ background: `linear-gradient(135deg, ${accent}33, ${accent}11)` }}
+          onClick={() => item.embed_url ? setShowEmbed(true) : window.open(item.url, '_blank')}
+        >
           <div className="media-placeholder-icon">{platform.icon}</div>
+          {!item.embed_url && <div className="media-placeholder-text">Click to Open</div>}
         </div>
       )}
       <div className="media-info">

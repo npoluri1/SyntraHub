@@ -140,6 +140,14 @@ async def advance_chapter(schedule_id: int, db: Session = Depends(get_db)):
     return {"message": f"Advanced to chapter {schedule.current_chapter}"}
 
 
+@router.get("/test-notification")
+async def test_notification(user_id: int = Query(1), db: Session = Depends(get_db)):
+    """Triggers the daily reading notification system immediately for all active users."""
+    from backend.tasks.scheduler import send_daily_notifications
+    send_daily_notifications()
+    return {"status": "triggered", "message": "Notification process started for all active users"}
+
+
 @router.post("/send-notification")
 async def send_todays_reading(
     user_id: int = Query(1),
