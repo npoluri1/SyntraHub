@@ -22,11 +22,13 @@ import RewardsPage from './pages/RewardsPage';
 import HowItWorks from './pages/HowItWorks';
 import DailyReading from './pages/DailyReading';
 import LoginPage from './pages/LoginPage';
+import NotificationsPage from './pages/NotificationsPage';
 import './styles.css';
 
 const pages = [
   { k: 'dashboard', c: Dashboard },
   { k: 'library', c: Library },
+  { k: 'notifications', c: NotificationsPage },
   { k: 'media', c: MediaGallery },
   { k: 'podcasts', c: Podcasts },
   { k: 'videos', c: VideoChannels },
