@@ -26,6 +26,16 @@ def seed():
     init_db()
     db = SessionLocal()
     try:
+        # Clear all existing data to ensure clean state
+        db.query(BookImage).delete()
+        db.query(PlaylistVideo).delete()
+        db.query(VideoPlaylist).delete()
+        db.query(PodcastEpisode).delete()
+        db.query(MediaContent).delete()
+        db.execute(book_categories.delete())
+        db.query(Book).delete()
+        db.query(Category).delete()
+        db.commit()
 
         categories_data = [
             ("Self-Help", "self-help", "Personal growth & productivity", "🧠", [
