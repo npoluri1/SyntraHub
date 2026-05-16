@@ -26,28 +26,44 @@ const NotificationsPage = () => {
   return (
     <motion.div className="page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="page-header">
-        <h1><Icon name="bell" /> Notifications</h1>
+        <h1><Icon name="bell" /> Notification Logs</h1>
       </div>
       
       {loading ? (
         <p className="loading">Loading logs...</p>
       ) : logs.length === 0 ? (
         <div className="empty-state">
-          <h3>No notifications yet</h3>
-          <p>Your daily reading updates will appear here.</p>
+          <h3>No notifications recorded</h3>
+          <p>Your daily reading updates will appear here once they are sent.</p>
         </div>
       ) : (
-        <div className="history-list">
-          {logs.map(log => (
-            <motion.div key={log.id} className="history-card glow-card" initial={{ y: 20 }} animate={{ y: 0 }}>
-              <div className="history-header">
-                <span className={`badge badge-${log.status}`}>{log.channel.toUpperCase()}</span>
-                <span className="history-date">{new Date(log.sent_at).toLocaleString()}</span>
-              </div>
-              <p>Status: {log.status}</p>
-              {log.error_message && <p className="error-text">Error: {log.error_message}</p>}
-            </motion.div>
-          ))}
+        <div className="notification-table-container">
+          <table className="notification-table">
+            <thead>
+              <tr>
+                <th>Channel</th>
+                <th>Status</th>
+                <th>Time</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log, index) => (
+                <tr key={index} className={log.status === 'failed' ? 'row-error' : ''}>
+                  <td>
+                    <span className={`badge badge-${log.channel}`}>{log.channel.toUpperCase()}</span>
+                  </td>
+                  <td>
+                    <span className={`status-pill ${log.status}`}>
+                      {log.status === 'sent' ? '✅ Sent' : '❌ Failed'}
+                    </span>
+                  </td>
+                  <td>{new Date(log.sent_at).toLocaleString()}</td>
+                  <td>{log.error_message || 'No errors reported'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </motion.div>
