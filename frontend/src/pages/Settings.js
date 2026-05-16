@@ -28,19 +28,21 @@ const Settings = () => {
 
   const saveSettings = async () => {
     try {
-      const { api, toast } = await import('../api');
       const u = JSON.parse(localStorage.getItem('book_user') || '{}');
-      if (!u.id) return;
-      const d = await api(`/api/users/${u.id}`, {
+      console.log("Saving settings for user:", u.id, "Settings:", settings);
+      
+      const response = await api(`/api/users/${u.id}`, {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),
       });
-      setSettings(d);
-      const { toast: t } = await import('react-toastify');
-      t('Settings saved!', { type: 'success' });
+      console.log("Save successful:", response);
+      
+      setSettings(response);
+      toast.success('Settings saved!');
     } catch (e) {
-      const { toast: t } = await import('react-toastify');
-      t(e.message, { type: 'error' });
+      console.error("Save failed:", e);
+      toast.error(e.message || 'Failed to save settings');
     }
   };
 
