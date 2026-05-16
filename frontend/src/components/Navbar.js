@@ -22,11 +22,12 @@ const navItems = [
   { k: 'rewards', i: 'rewards', l: 'Rewards' },
 ];
 
-const mainTabs = navItems.slice(0, 8);
-const moreTabs = navItems.slice(8);
+const mainTabs = navItems;
+const moreTabs = [];
 
 const Navbar = () => {
   const { page, setPage, cart, selectedCurrency, currencies, changeCurrency, authToken, handleLogout, user } = useApp();
+  // We don't actually need showMore logic if everything is in mainTabs
   const [showMore, setShowMore] = useState(false);
 
   return (
