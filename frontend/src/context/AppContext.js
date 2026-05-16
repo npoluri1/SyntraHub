@@ -73,14 +73,14 @@ export const AppProvider = ({ children }) => {
 
   const handleLogin = async (email, password) => {
     try {
-      const formData = new FormData();
-      formData.append('username', email);
-      formData.append('password', password);
+      const params = new URLSearchParams();
+      params.append('username', email);
+      params.append('password', password);
 
       const data = await api('/api/auth/login', {
         method: 'POST',
-        body: formData,
-        isFormData: true
+        body: params,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
 
       localStorage.setItem('auth_token', data.access_token);
@@ -89,7 +89,6 @@ export const AppProvider = ({ children }) => {
       setUser(data.user);
       setPage('dashboard');
       
-      // Explicitly reload cart after login
       await loadInitialData();
     } catch (e) { 
       console.error("Login Error:", e);
