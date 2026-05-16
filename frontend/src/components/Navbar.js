@@ -22,8 +22,8 @@ const navItems = [
   { k: 'rewards', i: 'rewards', l: 'Rewards' },
 ];
 
-const mainTabs = navItems.slice(0, 5);
-const moreTabs = navItems.slice(5);
+const mainTabs = navItems.slice(0, 8);
+const moreTabs = navItems.slice(8);
 
 const Navbar = () => {
   const { page, setPage, cart, selectedCurrency, currencies, changeCurrency, authToken, handleLogout, user } = useApp();
