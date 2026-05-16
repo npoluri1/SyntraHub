@@ -80,7 +80,7 @@ export const AppProvider = ({ children }) => {
       const data = await api('/api/auth/login', {
         method: 'POST',
         body: formData,
-        isFormData: true // We'll need to update api.js to handle this
+        isFormData: true
       });
 
       localStorage.setItem('auth_token', data.access_token);
@@ -88,8 +88,13 @@ export const AppProvider = ({ children }) => {
       setAuthToken(data.access_token);
       setUser(data.user);
       setPage('dashboard');
-      loadInitialData();
-    } catch (e) { throw e; }
+      
+      // Explicitly reload cart after login
+      await loadInitialData();
+    } catch (e) { 
+      console.error("Login Error:", e);
+      throw e; 
+    }
   };
 
   const handleRegister = async (name, email, password) => {
