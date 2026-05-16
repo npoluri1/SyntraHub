@@ -12,57 +12,36 @@ def start_scheduler():
     if scheduler.running:
         return
 
-    try:
-        from backend.config import settings
-        notify_time = settings.notification_time
-    except Exception:
-        notify_time = "08:30"
-
-    hour, minute = notify_time.split(":")
-    trigger = CronTrigger(hour=int(hour), minute=int(minute), timezone="Asia/Kolkata")
-
+    # Check every minute
     scheduler.add_job(
         send_daily_notifications,
-        trigger=trigger,
+        trigger="cron",
+        minute="*",
         id="daily_reading_notification",
-        name="Daily Reading Notification",
         replace_existing=True,
     )
 
     scheduler.start()
-    logger.info("Scheduler started with notification time: %s", notify_time)
-
-
-def send_daily_notifications():
-    try:
-        import asyncio
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-        if loop and loop.is_running():
-            loop.create_task(_send_notifications())
-        else:
-            asyncio.run(_send_notifications())
-    except Exception as e:
-        logger.error("Failed to send daily notifications: %s", e)
+    logger.info("Scheduler started (minute-interval mode)")
 
 
 async def _send_notifications():
     from backend.database.connection import SessionLocal
-    from backend.database.models import User, ReadingSchedule, Book, ChapterSummary as ChapterDB
+    from backend.database.models import User, ReadingSchedule, Book, ChapterSummary as ChapterDB, NotificationLog
     from backend.services.ai_summarizer import summarizer
     from backend.services.notification_service import (
         email_notifier, telegram_notifier, whatsapp_notifier,
     )
-    from datetime import date
+    from datetime import date, datetime
 
     db = SessionLocal()
     try:
+        now = datetime.now()
+        current_time = now.strftime("%H:%M")
         today = date.today().isoformat()
-        users = db.query(User).filter(User.is_active == True).all()
-
-        for user in users:
+        
+        # Get users scheduled for this exact minute
+        users = db.query(User).filter(User.is_active == True, User.notification_time == current_time).all()
             schedules = db.query(ReadingSchedule).filter(
                 ReadingSchedule.user_id == user.id,
                 ReadingSchedule.is_active == True,

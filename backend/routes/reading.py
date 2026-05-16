@@ -200,12 +200,26 @@ async def send_todays_reading(
     return {"results": results}
 
 
-@router.get("/history")
-async def get_reading_history(
+@router.get("/notifications")
+async def get_notifications(
     user_id: int = Query(1),
-    days: int = Query(30),
     db: Session = Depends(get_db),
 ):
+    from backend.database.models import NotificationLog
+    logs = db.query(NotificationLog).filter(
+        NotificationLog.user_id == user_id
+    ).order_by(NotificationLog.sent_at.desc()).all()
+    
+    return [
+        {
+            "id": l.id,
+            "channel": l.channel,
+            "status": l.status,
+            "error_message": l.error_message,
+            "sent_at": l.sent_at.isoformat() if l.sent_at else None,
+        }
+        for l in logs
+    ]
     from datetime import timedelta
     cutoff = date.today() - timedelta(days=days)
     summaries = db.query(ChapterDB, Book).join(
