@@ -1,7 +1,9 @@
-const API = process.env.REACT_APP_API_URL || '';
+// Try environment variable, fall back to production URL, then to relative path
+const API = process.env.REACT_APP_API_URL || 'https://syntrahub.onrender.com';
 
 export const api = async (endpoint, options = {}) => {
-  const url = `${API}${endpoint}`;
+  // If the endpoint is already absolute, don't prepend API
+  const url = endpoint.startsWith('http') ? endpoint : `${API}${endpoint}`;
   const token = localStorage.getItem('auth_token');
   
   const headers = { ...options.headers };
