@@ -1,8 +1,11 @@
-// Try environment variable, fall back to production URL, then to relative path
-const API = process.env.REACT_APP_API_URL || 'https://syntrahub.onrender.com';
+// Determine if we are in development mode
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// If local, use localhost:8000, otherwise use Render production URL
+const API = process.env.REACT_APP_API_URL || 
+            (isLocal ? 'http://localhost:8000' : 'https://syntrahub.onrender.com');
 
 export const api = async (endpoint, options = {}) => {
-  // If the endpoint is already absolute, don't prepend API
   const url = endpoint.startsWith('http') ? endpoint : `${API}${endpoint}`;
   const token = localStorage.getItem('auth_token');
   
