@@ -29,33 +29,23 @@ const MediaCard = ({ item }) => {
           <iframe 
             src={item.embed_url} 
             title={item.title} 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen 
-            loading="lazy" 
-            onError={() => {
-              setShowEmbed(false);
-              setThumbError(true); // If embed fails, maybe thumb fails too
-            }}
+            loading="eager" 
+            style={{ width: '100%', height: '100%', border: 'none' }}
           />
           <button className="btn-close-embed" onClick={() => setShowEmbed(false)}>×</button>
         </div>
-      ) : item.thumbnail_url && !thumbError ? (
+      ) : (
         <div 
           className="media-thumb" 
-          style={{ backgroundImage: `url(${item.thumbnail_url})` }}
+          style={{ backgroundImage: `url(${item.thumbnail_url || ''})` }}
           onClick={() => item.embed_url ? setShowEmbed(true) : window.open(item.url, '_blank')}
         >
           <div className="media-play-pulse" style={{ borderColor: platform.color }}>
             <div className="media-play" style={{ color: platform.color }}>{platform.icon}</div>
           </div>
-          <img src={item.thumbnail_url} alt="" style={{ display: 'none' }} onError={() => setThumbError(true)} />
         </div>
-      ) : (
-        <AiMediaPlaceholder 
-          type={item.media_type || 'video'} 
-          accent={accent} 
-          className="media-thumb-fallback"
-          onClick={() => item.embed_url ? setShowEmbed(true) : window.open(item.url, '_blank')}
-        />
       )}
       <div className="media-info">
         <h3 className="media-title">{item.title}</h3>
