@@ -24,7 +24,7 @@ const MediaCard = ({ item }) => {
         {platform.icon} {platform.label}
       </div>
       
-      {item.embed_url && showEmbed ? (
+      {item.embed_url && item.platform === 'youtube' && showEmbed ? (
         <div className="media-embed">
           <iframe 
             src={item.embed_url} 
@@ -40,7 +40,13 @@ const MediaCard = ({ item }) => {
         <div 
           className="media-thumb" 
           style={{ backgroundImage: `url(${item.thumbnail_url || ''})` }}
-          onClick={() => item.embed_url ? setShowEmbed(true) : window.open(item.url, '_blank')}
+          onClick={() => {
+            if (item.platform === 'youtube') {
+              setShowEmbed(true);
+            } else {
+              window.open(item.url, '_blank');
+            }
+          }}
         >
           <div className="media-play-pulse" style={{ borderColor: platform.color }}>
             <div className="media-play" style={{ color: platform.color }}>{platform.icon}</div>
