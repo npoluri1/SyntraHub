@@ -33,9 +33,12 @@ async def upload_books(file: UploadFile = File(...), db: Session = Depends(get_d
         dest_path.write_bytes(content)
         parsed_books = parse_excel_books(str(dest_path))
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"DEBUG: Parse failed: {e}\n{error_trace}")
         if dest_path.exists():
             dest_path.unlink(missing_ok=True)
-        raise HTTPException(400, f"Failed to parse Excel file: {e}")
+        raise HTTPException(400, f"Failed to parse Excel file: {str(e)}")
 
     if not parsed_books:
         if dest_path.exists():
