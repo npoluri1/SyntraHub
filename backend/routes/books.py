@@ -26,20 +26,39 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 @router.post("/upload", response_model=BookUploadResponse)
 async def upload_books(file: UploadFile = File(...), db: Session = Depends(get_db)):
     ext = Path(file.filename).suffix.lower() if file.filename else ""
-    if ext not in [".xlsx", ".xls", ".pdf", ".docx", ".doc"]:
-        raise HTTPException(400, "Only Excel, PDF, and Word documents are supported")
+    if ext not in [".xlsx", ".xls", ".pdf", ".docx", ".doc", ".mp3", ".mp4"]:
+        raise HTTPException(400, "Only Excel, PDF, Word, MP3, and MP4 files are supported")
 
     dest_path = UPLOAD_DIR / f"{Path(file.filename).stem}_{int(__import__('time').time())}{ext}"
     try:
         content = await file.read()
         dest_path.write_bytes(content)
+
         if ext in [".xlsx", ".xls"]:
             parsed_books = parse_excel_books(str(dest_path))
         elif ext == ".pdf":
             parsed_books = [parse_pdf(str(dest_path))]
-        else: # docx, doc
+        elif ext in [".docx", ".doc"]:
             parsed_books = [parse_docx(str(dest_path))]
+        else: # mp3, mp4
+            from backend.database.models import MediaContent
+            media = MediaContent(
+                title=Path(file.filename).stem,
+                media_type="audio" if ext == ".mp3" else "video",
+                platform="local",
+                url=str(dest_path),
+                thumbnail_url=None
+            )
+            db.add(media)
+            db.commit()
+            return BookUploadResponse(
+                message=f"Uploaded media file: {file.filename}",
+                books_found=1,
+                books_added=1,
+                books=[file.filename]
+            )
     except Exception as e:
+
         import traceback
         error_trace = traceback.format_exc()
         print(f"DEBUG: Parse failed: {e}\n{error_trace}")
