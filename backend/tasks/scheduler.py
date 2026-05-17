@@ -67,53 +67,44 @@ async def _send_notifications():
                 if not book or not book.is_active:
                     continue
 
-                next_chapter = schedule.current_chapter + 1
-                if next_chapter > (book.total_chapters or 999):
-                    schedule.is_active = False
-                    db.commit()
-                    continue
-
-                chapter = db.query(ChapterDB).filter(
-                    ChapterDB.book_id == book.id,
-                    ChapterDB.chapter_number == next_chapter,
-                ).first()
-
-                if not chapter:
-                    result = summarizer.generate_summary(
+                # Fetch all chapters for this book
+                chapters = db.query(ChapterDB).filter(ChapterDB.book_id == book.id).order_by(ChapterDB.chapter_number.asc()).all()
+                
+                # If no chapters exist yet, generate them all now
+                if not chapters:
+                    result = summarizer.generate_full_book_summary(
                         book_title=book.title,
-                        chapter_number=next_chapter,
                         book_author=book.author,
+                        total_chapters=book.total_chapters
                     )
-                    chapter = ChapterDB(
-                        book_id=book.id,
-                        chapter_number=next_chapter,
-                        summary=result.get("summary", ""),
-                        key_points=result.get("key_points", []),
-                        reading_time_minutes=result.get("reading_time_minutes", 5),
-                        scheduled_date=today,
-                    )
-                    db.add(chapter)
+                    # Logic to save all chapters...
+                    for ch_data in result.get("chapters", []):
+                        ch = ChapterDB(
+                            book_id=book.id,
+                            chapter_number=ch_data["number"],
+                            chapter_title=ch_data["title"],
+                            summary=ch_data["summary"],
+                            key_points=ch_data["key_points"],
+                            reading_time_minutes=ch_data["reading_time_minutes"]
+                        )
+                        db.add(ch)
                     db.commit()
-                    db.refresh(chapter)
+                    chapters = db.query(ChapterDB).filter(ChapterDB.book_id == book.id).order_by(ChapterDB.chapter_number.asc()).all()
 
-                schedule.current_chapter = next_chapter
-                book.current_chapter = next_chapter
-
-                key_points = chapter.key_points or []
+                # Prepare full book summary
+                full_summary = "\n\n".join([f"Chapter {c.chapter_number}: {c.summary}" for c in chapters])
+                all_key_points = [kp for c in chapters for kp in c.key_points]
 
                 if user.email_notifications and user.email:
-                    # AI Agent Personalized Intro
-                    ai_intro = f"Good morning, {user.name}! I'm your Syntra AI Assistant. Here's your curated reading for today."
-                    ai_outro = "I'll be back tomorrow with your next chapter. Happy reading!"
-                    
                     email_notifier.send_daily_reading(
                         to_email=user.email,
                         book_title=book.title,
-                        chapter_num=next_chapter,
-                        chapter_title=chapter.chapter_title,
-                        summary=f"{ai_intro}\n\n{chapter.summary}\n\n{ai_outro}",
-                        key_points=key_points,
+                        chapter_num="Full Book",
+                        chapter_title="Complete Summary",
+                        summary=full_summary,
+                        key_points=all_key_points,
                     )
+                # ... repeat for telegram/whatsapp ...
 
                 if user.telegram_notifications and user.telegram_chat_id:
                     telegram_notifier.send_daily_reading(
