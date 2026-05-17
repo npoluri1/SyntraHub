@@ -49,15 +49,15 @@ const Dashboard = () => {
       <motion.div className="stats-grid" variants={itemVariants}>
         <div className="stat-card stat-card-3d float-3d" onClick={() => setPage('library')}>
           <div className="stat-icon card-shine" style={{ background: '#e8f0fe' }}>📚</div>
-          <div className="stat-info"><h3>{dashboard.total_books}</h3><p>Books Available</p></div>
+          <div className="stat-info"><h3>{dashboard.total_books}</h3><p>Books</p></div>
         </div>
-        <div className="stat-card stat-card-3d float-delayed-1" onClick={() => setPage('orders')}>
-          <div className="stat-icon card-shine" style={{ background: '#e8f8ee' }}>📦</div>
-          <div className="stat-info"><h3>{dashboard.total_orders}</h3><p>Orders</p></div>
+        <div className="stat-card stat-card-3d float-delayed-1" onClick={() => setPage('library')}>
+          <div className="stat-icon card-shine" style={{ background: '#e8f8ee' }}>💻</div>
+          <div className="stat-info"><h3>{dashboard.total_electronics}</h3><p>Electronics</p></div>
         </div>
-        <div className="stat-card stat-card-3d float-delayed-2">
-          <div className="stat-icon card-shine" style={{ background: '#fef5e8' }}>📅</div>
-          <div className="stat-info"><h3>{activeSchedules}</h3><p>Active Reading</p></div>
+        <div className="stat-card stat-card-3d float-delayed-2" onClick={() => setPage('library')}>
+          <div className="stat-icon card-shine" style={{ background: '#fef5e8' }}>👕</div>
+          <div className="stat-info"><h3>{dashboard.total_clothing}</h3><p>Clothing</p></div>
         </div>
         <div className="stat-card stat-card-3d float-3d" onClick={() => setPage('cart')}>
           <div className="stat-icon card-shine" style={{ background: '#f0e8fe' }}>🛒</div>
