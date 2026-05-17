@@ -221,16 +221,6 @@ body::after {
   font-size: 11px;
 }
 
-  gap: 2px;
-  padding: 4px 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-  min-width: 48px;
-}
-
-.tab-item .icon-svg { transition: all 0.2s; }
-
 .tab-item.active { color: var(--primary); }
 .tab-item.active .icon-svg { stroke: var(--primary); }
 
@@ -238,6 +228,7 @@ body::after {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: -0.2px;
+}
 }
 
 .tab-badge {
