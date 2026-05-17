@@ -90,7 +90,7 @@ const BooksPage = () => {
       )}
 
       <p className="page-subtitle" style={{ marginBottom: 16 }}>
-        Upload Excel files (.xlsx) with columns: title, author, price, description, product_type (book/electronics/clothing), brand.
+        Upload Excel files (.xlsx), documents (.pdf, .docx), or media (.mp3, .mp4). For Excel, include columns: title, author, price, description, product_type (book/electronics/clothing), brand.
       </p>
 
       <div className="filter-bar" style={{ marginBottom: 16 }}>
