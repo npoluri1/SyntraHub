@@ -26,27 +26,27 @@ def create_venue(data: VenueCreate, db: Session = Depends(get_db)):
     db.add(venue)
     db.commit()
     db.refresh(venue)
-    return venue
+    from sqlalchemy.orm import Session, joinedload
+    # ... rest of imports
 
+    @router.get("", response_model=List[EventResponse])
+    def get_events(
+        category: str = None,
+        event_type: str = None,
+        status: str = "upcoming",
+        page: int = Query(1, ge=1),
+        page_size: int = Query(20, ge=1, le=100),
+        db: Session = Depends(get_db),
+    ):
+        q = db.query(Event).options(joinedload(Event.venue))
+        if category:
+            q = q.filter(Event.category == category)
+        if event_type:
+            q = q.filter(Event.event_type == event_type)
+        if status:
+            q = q.filter(Event.status == status)
+        events = q.order_by(Event.start_date.asc()).offset((page - 1) * page_size).limit(page_size).all()
 
-@router.get("", response_model=List[EventResponse])
-def get_events(
-    category: str = None,
-    event_type: str = None,
-    status: str = "upcoming",
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db),
-):
-    q = db.query(Event).options(db.query(Event).joinedload(Event.venue).execution_options())
-    q = db.query(Event)
-    if category:
-        q = q.filter(Event.category == category)
-    if event_type:
-        q = q.filter(Event.event_type == event_type)
-    if status:
-        q = q.filter(Event.status == status)
-    events = q.order_by(Event.start_date.asc()).offset((page - 1) * page_size).limit(page_size).all()
     result = []
     for e in events:
         result.append(EventResponse(

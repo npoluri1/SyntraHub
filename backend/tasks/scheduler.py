@@ -25,6 +25,19 @@ def start_scheduler():
     logger.info("Scheduler started (minute-interval mode)")
 
 
+def send_daily_notifications():
+    import asyncio
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    if loop.is_running():
+        loop.create_task(_send_notifications())
+    else:
+        loop.run_until_complete(_send_notifications())
+
 async def _send_notifications():
     from backend.database.connection import SessionLocal
     from backend.database.models import User, ReadingSchedule, Book, ChapterSummary as ChapterDB, NotificationLog
@@ -42,6 +55,8 @@ async def _send_notifications():
         
         # Get users scheduled for this exact minute
         users = db.query(User).filter(User.is_active == True, User.notification_time == current_time).all()
+        
+        for user in users:
             schedules = db.query(ReadingSchedule).filter(
                 ReadingSchedule.user_id == user.id,
                 ReadingSchedule.is_active == True,
