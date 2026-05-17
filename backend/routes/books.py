@@ -14,6 +14,7 @@ from backend.models.schemas import (
     BookUploadResponse, GenerateSummaryRequest, SearchRequest, SearchResult,
 )
 from backend.services.excel_parser import parse_excel_books, search_books_by_regex
+from backend.services.doc_parser import parse_pdf, parse_docx
 from backend.services.ai_summarizer import summarizer
 
 router = APIRouter(prefix="/api/books", tags=["Books"])
@@ -24,21 +25,27 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @router.post("/upload", response_model=BookUploadResponse)
 async def upload_books(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not file.filename or not file.filename.endswith((".xlsx", ".xls")):
-        raise HTTPException(400, "Only Excel files (.xlsx, .xls) are supported")
+    ext = Path(file.filename).suffix.lower() if file.filename else ""
+    if ext not in [".xlsx", ".xls", ".pdf", ".docx", ".doc"]:
+        raise HTTPException(400, "Only Excel, PDF, and Word documents are supported")
 
-    dest_path = UPLOAD_DIR / f"{Path(file.filename).stem}_{int(__import__('time').time())}{Path(file.filename).suffix}"
+    dest_path = UPLOAD_DIR / f"{Path(file.filename).stem}_{int(__import__('time').time())}{ext}"
     try:
         content = await file.read()
         dest_path.write_bytes(content)
-        parsed_books = parse_excel_books(str(dest_path))
+        if ext in [".xlsx", ".xls"]:
+            parsed_books = parse_excel_books(str(dest_path))
+        elif ext == ".pdf":
+            parsed_books = [parse_pdf(str(dest_path))]
+        else: # docx, doc
+            parsed_books = [parse_docx(str(dest_path))]
     except Exception as e:
         import traceback
         error_trace = traceback.format_exc()
         print(f"DEBUG: Parse failed: {e}\n{error_trace}")
         if dest_path.exists():
             dest_path.unlink(missing_ok=True)
-        raise HTTPException(400, f"Failed to parse Excel file: {str(e)}")
+        raise HTTPException(400, f"Failed to parse file: {str(e)}")
 
     if not parsed_books:
         if dest_path.exists():
